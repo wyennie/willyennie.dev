@@ -1,0 +1,325 @@
+---
+import { SITE } from '~/lib/site';
+
+const items = [
+  { kind: 'route', id: 'go-home',     label: 'Index',           hint: '/',         href: '/' },
+  { kind: 'route', id: 'go-work',     label: 'Work / Résumé',   hint: '/work',     href: '/work' },
+  { kind: 'route', id: 'go-projects', label: 'Projects',        hint: '/projects', href: '/projects' },
+  { kind: 'route', id: 'go-writing',  label: 'Writing',         hint: '/writing',  href: '/writing' },
+  { kind: 'route', id: 'go-now',      label: 'Now',             hint: '/now',      href: '/now' },
+  { kind: 'project', id: 'p-firefly',   label: 'Firefly',     hint: 'project', href: '/projects/firefly' },
+  { kind: 'project', id: 'p-zenml',     label: 'ZenML',       hint: 'project', href: '/projects/zenml' },
+  { kind: 'project', id: 'p-hookscope', label: 'HookScope',   hint: 'project', href: '/projects/hookscope' },
+  { kind: 'project', id: 'p-flightwise',label: 'FlightWise',  hint: 'project', href: '/projects/flightwise' },
+  { kind: 'project', id: 'p-taskvault', label: 'TaskVault',   hint: 'project', href: '/projects/taskvault' },
+  { kind: 'project', id: 'p-shopsense', label: 'ShopSense',   hint: 'project', href: '/projects/shopsense' },
+  { kind: 'action', id: 'a-email',    label: `Email — ${SITE.email}`, hint: 'mailto', href: `mailto:${SITE.email}` },
+  { kind: 'action', id: 'a-github',   label: 'GitHub',                 hint: 'external', href: SITE.github },
+  { kind: 'action', id: 'a-linkedin', label: 'LinkedIn',               hint: 'external', href: SITE.linkedin },
+  { kind: 'action', id: 'a-rss',      label: 'RSS',                    hint: 'feed', href: '/rss.xml' },
+  { kind: 'action', id: 'a-print',    label: 'Print résumé',           hint: '/work', href: '/work#print' },
+];
+---
+
+<div id="cmdk-trigger-wrap" class="trigger-wrap no-print">
+  <button id="cmdk-trigger" type="button" aria-haspopup="dialog" aria-controls="cmdk-dialog">
+    <span>Search</span>
+    <span class="kbd-hint" aria-hidden="true">
+      <kbd class="mac">⌘</kbd><kbd class="win">Ctrl</kbd><kbd>K</kbd>
+    </span>
+  </button>
+</div>
+
+<dialog id="cmdk-dialog" aria-label="Command palette">
+  <div class="cmdk-shell" role="document">
+    <div class="cmdk-input-row">
+      <span class="prompt" aria-hidden="true">›</span>
+      <input
+        id="cmdk-input"
+        type="text"
+        placeholder="Type to search…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Search commands and pages"
+      />
+      <button id="cmdk-close" type="button" aria-label="Close">esc</button>
+    </div>
+    <ul id="cmdk-list" role="listbox" aria-label="Results"></ul>
+    <footer class="cmdk-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> open</span>
+      <span><kbd>esc</kbd> close</span>
+    </footer>
+  </div>
+</dialog>
+
+<script type="application/json" id="cmdk-data" set:html={JSON.stringify(items)}></script>
+
+<script>
+  type Item = {
+    kind: 'route' | 'project' | 'action';
+    id: string;
+    label: string;
+    hint: string;
+    href: string;
+  };
+
+  const init = () => {
+    const dataEl = document.getElementById('cmdk-data');
+    const dialog = document.getElementById('cmdk-dialog') as HTMLDialogElement | null;
+    const trigger = document.getElementById('cmdk-trigger');
+    const closeBtn = document.getElementById('cmdk-close');
+    const input = document.getElementById('cmdk-input') as HTMLInputElement | null;
+    const list = document.getElementById('cmdk-list');
+    if (!dataEl || !dialog || !trigger || !input || !list || !closeBtn) return;
+    if ((dialog as any).__cmdkBound) return;
+    (dialog as any).__cmdkBound = true;
+
+    const items: Item[] = JSON.parse(dataEl.textContent || '[]');
+    let filtered: Item[] = items;
+    let active = 0;
+
+    const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
+    document.documentElement.dataset.platform = isMac ? 'mac' : 'win';
+
+    const score = (q: string, label: string): number => {
+      if (!q) return 1;
+      const l = label.toLowerCase();
+      const needle = q.toLowerCase();
+      if (l.startsWith(needle)) return 3;
+      if (l.includes(needle)) return 2;
+      let i = 0;
+      for (const ch of needle) {
+        i = l.indexOf(ch, i);
+        if (i < 0) return 0;
+        i++;
+      }
+      return 1;
+    };
+
+    const render = () => {
+      list.innerHTML = '';
+      filtered.forEach((item, idx) => {
+        const li = document.createElement('li');
+        li.role = 'option';
+        li.dataset.index = String(idx);
+        li.dataset.href = item.href;
+        li.dataset.kind = item.kind;
+        li.className = idx === active ? 'active' : '';
+        li.innerHTML = `
+          <span class="kind">${item.kind}</span>
+          <span class="label"></span>
+          <span class="hint"></span>
+        `;
+        (li.querySelector('.label') as HTMLElement).textContent = item.label;
+        (li.querySelector('.hint') as HTMLElement).textContent = item.hint;
+        li.addEventListener('mousemove', () => {
+          if (active !== idx) { active = idx; render(); }
+        });
+        li.addEventListener('click', () => navigate(item));
+        list.appendChild(li);
+      });
+      const activeEl = list.querySelector('li.active') as HTMLElement | null;
+      activeEl?.scrollIntoView({ block: 'nearest' });
+    };
+
+    const navigate = (item: Item) => {
+      close();
+      if (item.href.startsWith('http') || item.href.startsWith('mailto:')) {
+        window.location.href = item.href;
+      } else {
+        window.location.assign(item.href);
+      }
+    };
+
+    const filter = () => {
+      const q = input.value.trim();
+      filtered = items
+        .map((it) => ({ it, s: score(q, it.label) + score(q, it.hint) * 0.5 }))
+        .filter((x) => x.s > 0)
+        .sort((a, b) => b.s - a.s)
+        .map((x) => x.it);
+      active = 0;
+      render();
+    };
+
+    const open = () => {
+      input.value = '';
+      filtered = items;
+      active = 0;
+      render();
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+      requestAnimationFrame(() => input.focus());
+    };
+    const close = () => {
+      if (dialog.open) dialog.close();
+    };
+
+    trigger.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) close();
+    });
+
+    input.addEventListener('input', filter);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        active = Math.min(filtered.length - 1, active + 1);
+        render();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        active = Math.max(0, active - 1);
+        render();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const item = filtered[active];
+        if (item) navigate(item);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const mod = isMac ? e.metaKey : e.ctrlKey;
+      if (mod && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (dialog.open) close(); else open();
+      } else if (e.key === '/' && document.activeElement === document.body) {
+        e.preventDefault();
+        open();
+      }
+    });
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .trigger-wrap {
+    position: fixed;
+    bottom: var(--s-4);
+    right: var(--s-4);
+    z-index: 50;
+  }
+  #cmdk-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    background: var(--c-bg-raised);
+    border: 1px solid var(--c-border-strong);
+    color: var(--c-text-muted);
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-pill);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  #cmdk-trigger:hover {
+    color: var(--c-text);
+    border-color: var(--c-accent-dim);
+  }
+  .kbd-hint kbd {
+    margin-right: 1px;
+  }
+  :global(html[data-platform="mac"]) #cmdk-trigger .win { display: none; }
+  :global(html[data-platform="win"]) #cmdk-trigger .mac { display: none; }
+  :global(html:not([data-platform])) #cmdk-trigger .win { display: none; }
+
+  #cmdk-dialog {
+    border: 1px solid var(--c-border-strong);
+    background: var(--c-bg-raised);
+    color: var(--c-text);
+    padding: 0;
+    border-radius: var(--r-lg);
+    width: min(38rem, calc(100vw - 2rem));
+    max-height: 70vh;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+    margin: auto;
+  }
+  #cmdk-dialog::backdrop {
+    background: rgba(8, 9, 10, 0.6);
+    backdrop-filter: blur(2px);
+  }
+  .cmdk-shell { display: flex; flex-direction: column; }
+  .cmdk-input-row {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding: var(--s-3) var(--s-4);
+    border-bottom: 1px solid var(--c-border);
+  }
+  .prompt {
+    font-family: var(--font-mono);
+    color: var(--c-accent);
+  }
+  #cmdk-input {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    outline: none;
+    font-family: var(--font-mono);
+    font-size: var(--fs-md);
+    padding: var(--s-1) 0;
+  }
+  #cmdk-close {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-muted);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+    padding: 0.1em 0.5em;
+  }
+
+  #cmdk-list {
+    list-style: none;
+    margin: 0;
+    padding: var(--s-2);
+    overflow-y: auto;
+    max-height: 50vh;
+  }
+  #cmdk-list :global(li) {
+    display: grid;
+    grid-template-columns: 5rem 1fr auto;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-md);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+  }
+  #cmdk-list :global(li.active) {
+    background: color-mix(in srgb, var(--c-accent) 12%, transparent);
+    color: var(--c-text);
+  }
+  #cmdk-list :global(li.active .label) { color: var(--c-accent); }
+  #cmdk-list :global(.kind) {
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--c-text-dim);
+  }
+  #cmdk-list :global(.label) { color: var(--c-text); }
+  #cmdk-list :global(.hint) { color: var(--c-text-dim); font-size: var(--fs-xs); }
+
+  .cmdk-foot {
+    display: flex;
+    gap: var(--s-4);
+    padding: var(--s-2) var(--s-4);
+    border-top: 1px solid var(--c-border);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-dim);
+  }
+
+  @media (max-width: 540px) {
+    .trigger-wrap { bottom: var(--s-3); right: var(--s-3); }
+    #cmdk-list :global(li) { grid-template-columns: 4rem 1fr; }
+    #cmdk-list :global(.hint) { display: none; }
+  }
+</style>

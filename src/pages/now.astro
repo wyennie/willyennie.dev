@@ -1,0 +1,77 @@
+---
+import Layout from '~/layouts/Layout.astro';
+
+const updated = '2026-04-28';
+---
+
+<Layout
+  title="now"
+  description="What Will Yennie is working on, learning, and looking for right now."
+>
+  <div class="container page prose">
+    <header class="head">
+      <h1>now</h1>
+      <p class="meta">Updated {updated} ·
+        <a href="https://nownownow.com/about" rel="noopener">/now page</a>
+      </p>
+    </header>
+
+    <h2>Working on</h2>
+    <ul>
+      <li>This site, fast. Replacing the two-year-stale willyennie.com.</li>
+      <li>A small library of "things I should have written down the first time"
+        — internal notes I want to pull out into public posts.</li>
+    </ul>
+
+    <h2>Learning</h2>
+    <ul>
+      <li>Going deeper on Postgres internals — locking, MVCC, query planner
+        quirks. The kind of thing you only need until you really need it.</li>
+      <li>Sharper at frontend craft (typed UI primitives, design tokens, view
+        transitions) without falling back into utility-class soup.</li>
+    </ul>
+
+    <h2>Looking for</h2>
+    <ul>
+      <li>A senior full-stack role on a small team with real product surface.
+        Rails or TypeScript backends preferred, but I care about the team and
+        the problem more than the language.</li>
+      <li>Interesting problems where the data model is the hard part.</li>
+      <li>Ideally NYC-friendly hours (remote or hybrid).</li>
+    </ul>
+
+    <h2>Not doing</h2>
+    <ul>
+      <li>Side-project sprawl. One thing at a time, finished.</li>
+    </ul>
+
+    <p class="footnote">
+      This is a <a href="https://nownownow.com/about" rel="noopener">now page</a>,
+      in the Sivers sense — what's actually true today, not a permanent bio.
+    </p>
+  </div>
+</Layout>
+
+<style>
+  .page { padding-block: var(--s-7) var(--s-8); }
+  .head { margin-bottom: var(--s-6); }
+  .head h1 { font-size: var(--fs-2xl); }
+  .meta { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--c-text-muted); margin-top: var(--s-2); }
+  h2 {
+    font-size: var(--fs-md);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-accent);
+    margin-top: var(--s-6);
+    margin-bottom: var(--s-3);
+  }
+  ul { padding-left: 1.25rem; }
+  ul li { margin-bottom: var(--s-2); }
+  .footnote {
+    margin-top: var(--s-7);
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    border-top: 1px solid var(--c-border);
+    padding-top: var(--s-4);
+  }
+</style>

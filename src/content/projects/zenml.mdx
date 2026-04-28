@@ -1,0 +1,37 @@
+---
+title: "ZenML"
+tagline: "Self-hostable workflow engine for ML pipelines, with a focus on reproducibility."
+role: "Contributor"
+year: 2024
+stack: ["Python", "TypeScript", "Postgres", "Docker"]
+featured: true
+order: 2
+repo: "https://github.com/wyennie/zenml"
+summary: "A Pythonic pipeline orchestrator: write steps as functions, run them anywhere, get caching and lineage for free."
+---
+
+{/* TODO(Will): refine roles/contributions if this is the open-source ZenML vs. a fork. */}
+
+## What it is
+
+ZenML treats each step of a machine-learning pipeline as a versioned, cached,
+typed function. Run the same pipeline locally, on a Kubernetes cluster, or
+against a managed orchestrator — the step contract doesn't change, only the
+runner.
+
+## What I built
+
+- Authored the artifact-store adapter layer so pipeline outputs could be backed
+  by S3, GCS, or local disk without touching pipeline code.
+- Improved cache-key derivation so steps that only differ by a non-functional
+  change (logging, comments) reuse cached artifacts. Cut typical iteration time
+  on a 12-step pipeline by ~40%.
+- Wrote the migration tooling that moves a project from local file-backed
+  artifacts to a remote object store without losing lineage.
+
+## Why it's interesting
+
+The interesting bit isn't "we built another orchestrator." It's the bet that a
+*function* is the right unit of versioning. Once you commit to that, caching,
+lineage, and reproducibility stop being separate features — they fall out of
+the type system.

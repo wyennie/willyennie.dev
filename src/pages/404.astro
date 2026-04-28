@@ -1,0 +1,49 @@
+---
+import Layout from '~/layouts/Layout.astro';
+---
+
+<Layout title="404" description="Page not found." noindex>
+  <div class="container wrap">
+    <p class="status">404</p>
+    <h1>nothing here</h1>
+    <p class="lede prose">
+      The URL you tried doesn't exist, or it used to and doesn't anymore.
+      That's on me — I rebuilt this site recently. Try one of these:
+    </p>
+    <ul class="links">
+      <li><a href="/">→ index</a></li>
+      <li><a href="/projects">→ projects</a></li>
+      <li><a href="/work">→ work / résumé</a></li>
+      <li><a href="/writing">→ writing</a></li>
+    </ul>
+  </div>
+</Layout>
+
+<style>
+  .wrap {
+    padding-block: var(--s-9);
+    text-align: left;
+    max-width: 32rem;
+  }
+  .status {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-accent);
+    letter-spacing: 0.1em;
+  }
+  h1 {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    margin-top: var(--s-3);
+  }
+  .lede { margin-top: var(--s-4); color: var(--c-text-muted); }
+  .links {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-md);
+  }
+</style>

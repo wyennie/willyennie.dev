@@ -1,0 +1,43 @@
+---
+title: "Firefly"
+tagline: "Real-time collaborative debugger for distributed Ruby systems."
+role: "Co-creator, full-stack engineer"
+year: 2023
+stack: ["Ruby", "Rails", "WebSockets", "Redis", "PostgreSQL", "React"]
+featured: true
+order: 1
+repo: "https://github.com/wyennie/firefly"
+summary: "Multi-process Ruby debugger that lets a team step through a single, shared session in real time."
+---
+
+{/* TODO(Will): drop in 1–2 screenshots or a recorded demo gif under /public/projects/firefly/ */}
+
+## What it is
+
+Firefly is a real-time, collaborative debugger built for the kind of distributed
+Ruby systems where the bug only shows up under load — and where the engineer who
+wrote the offending code is not the one staring at production at 2am.
+
+It exposes a shared debug session over WebSockets so multiple engineers can step
+through the same backtrace at the same time, leaving inline annotations as they
+go.
+
+## What I built
+
+- Designed the actor-style session protocol that brokers control of the
+  paused process between connected clients (one driver at a time, with hand-offs).
+- Implemented the WebSocket transport layer on top of a Redis pub/sub backbone
+  so sessions survive a single Rails process going down.
+- Built the React-side timeline and breakpoint UI, plus the keyboard-first
+  step/continue/inspect controls.
+
+## What I'd do differently
+
+- Lean harder on existing debugger primitives (DAP) instead of rolling our own
+  protocol — we wrote a lot of plumbing that off-the-shelf tooling now covers.
+- Cache fewer things in Redis. We treated it as a database and paid for it.
+
+## Status
+
+Sunset as a product, kept around as a teaching artifact. The architecture writeup
+is the part still worth reading.

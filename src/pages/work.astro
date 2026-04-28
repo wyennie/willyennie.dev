@@ -1,0 +1,267 @@
+---
+import Layout from '~/layouts/Layout.astro';
+import { SITE } from '~/lib/site';
+
+const skills = {
+  Languages: ['Ruby', 'TypeScript', 'JavaScript', 'SQL', 'Bash'],
+  'Backend & data': ['Ruby on Rails', 'Sidekiq', 'PostgreSQL', 'Redis', 'GraphQL', 'REST'],
+  Frontend: ['React', 'Astro', 'Stimulus', 'CSS / CSS Modules', 'Vite'],
+  Infra: ['Docker', 'GitHub Actions', 'nginx', 'DigitalOcean', 'AWS (S3, RDS, EC2)'],
+  Practice: ['TDD', 'systems design', 'incident response', 'mentorship'],
+};
+
+const roles = [
+  {
+    company: 'Insight Designs Web Services',
+    title: 'Software Engineer', // TODO(Will): confirm exact title
+    location: 'Remote',
+    start: '20XX', // TODO(Will): fill
+    end: '2026',
+    summary: 'TODO(Will): one-line summary of what Insight Designs does and your scope there.',
+    bullets: [
+      'TODO(Will): 2–4 specific things shipped — feature, system, migration, savings, etc.',
+      'TODO(Will): a metric if you have one (perf win, infra cost, MTTR, etc.).',
+      'TODO(Will): mentorship, code review, hiring, on-call — anything cross-cutting.',
+    ],
+    stack: ['Rails', 'PostgreSQL', 'JavaScript', 'AWS'],
+    anchor: 'insight',
+  },
+  {
+    company: 'Independent / freelance',
+    title: 'Full-stack developer',
+    location: 'NYC',
+    start: '2020',
+    end: '20XX', // TODO(Will): fill (year you joined Insight)
+    summary: 'Worked with small teams and solo founders on production Rails/TypeScript apps.',
+    bullets: [
+      'Designed and shipped backends for early-stage products across e-commerce, scheduling, and content tooling.',
+      'Owned the boring-but-critical work: schema, background jobs, cache invalidation, deploy scripts.',
+      'Took several apps from "demo" to "responsibly running in production" — monitoring, backups, on-call runbooks.',
+    ],
+    stack: ['Rails', 'TypeScript', 'Postgres', 'Sidekiq', 'Docker'],
+    anchor: 'freelance',
+  },
+];
+
+const education = [
+  {
+    name: 'Launch School',
+    detail: 'Capstone graduate. Mastery-based core + capstone in distributed systems and full-stack apps.',
+    year: '20XX', // TODO(Will): fill
+  },
+];
+---
+
+<Layout title="work" description="Will Yennie — résumé, roles, and stack." bodyClass="work-page">
+  <article class="container resume">
+    <header class="masthead">
+      <div>
+        <h1>Will Yennie</h1>
+        <p class="subtitle">Full-stack engineer · Ruby on Rails · TypeScript · Postgres</p>
+      </div>
+      <ul class="contact">
+        <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+        <li>{SITE.location}</li>
+        <li><a href={SITE.linkedin}>linkedin.com/in/william-yennie</a></li>
+        <li><a href={SITE.github}>{SITE.github.replace('https://', '')}</a></li>
+      </ul>
+    </header>
+
+    <div class="print-hint no-print">
+      <p>
+        Want a PDF? <kbd>⌘</kbd> / <kbd>Ctrl</kbd> + <kbd>P</kbd> &rarr; <em>Save as PDF</em>.
+        This page is print-styled.
+      </p>
+    </div>
+
+    <section>
+      <h2>Summary</h2>
+      <p>
+        Engineer with deep Rails + Postgres roots and a working command of the
+        TypeScript/React side of the stack. I'm at my best on systems where
+        correctness and durability matter — payment flows, auth, scheduling,
+        anything where being subtly wrong is worse than being slow.
+      </p>
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+      {roles.map((r) => (
+        <article class="role" id={r.anchor}>
+          <header class="role-head">
+            <h3>{r.title} · <span class="company">{r.company}</span></h3>
+            <span class="when">{r.start} — {r.end} · {r.location}</span>
+          </header>
+          <p class="role-summary">{r.summary}</p>
+          <ul>
+            {r.bullets.map((b) => <li>{b}</li>)}
+          </ul>
+          <p class="stack-line">
+            <span class="lbl">stack:</span> {r.stack.join(' · ')}
+          </p>
+        </article>
+      ))}
+    </section>
+
+    <section class="cols">
+      <div>
+        <h2>Skills</h2>
+        <dl class="skills">
+          {Object.entries(skills).map(([k, v]) => (
+            <>
+              <dt>{k}</dt>
+              <dd>{v.join(', ')}</dd>
+            </>
+          ))}
+        </dl>
+      </div>
+
+      <div>
+        <h2>Education</h2>
+        {education.map((e) => (
+          <article class="edu">
+            <h3>{e.name}</h3>
+            <p>{e.detail}</p>
+            <p class="when">{e.year}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section>
+      <h2>Selected projects</h2>
+      <p class="muted">
+        Full case studies at <a href="/projects">willyennie.dev/projects</a>.
+      </p>
+      <ul class="proj-line">
+        <li><strong>Firefly</strong> — collaborative real-time debugger for distributed Ruby systems.</li>
+        <li><strong>ZenML</strong> — function-as-step ML pipeline orchestrator with caching and lineage.</li>
+        <li><strong>HookScope</strong> — static analyzer for unsafe React hook usage.</li>
+        <li><strong>FlightWise / TaskVault / ShopSense</strong> — earlier work on flight search, encrypted task logs, ledger-based commerce.</li>
+      </ul>
+    </section>
+  </article>
+</Layout>
+
+<style>
+  .resume {
+    padding-block: var(--s-7) var(--s-8);
+    max-width: 50rem;
+  }
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-5);
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--c-border);
+    padding-bottom: var(--s-5);
+    margin-bottom: var(--s-6);
+  }
+  .masthead h1 { font-size: var(--fs-2xl); }
+  .subtitle {
+    color: var(--c-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    margin-top: var(--s-2);
+  }
+  .contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-text-muted);
+    text-align: right;
+    line-height: var(--lh-snug);
+  }
+  .print-hint {
+    border: 1px dashed var(--c-border-strong);
+    border-radius: var(--r-md);
+    padding: var(--s-3) var(--s-4);
+    margin-bottom: var(--s-6);
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+  }
+
+  section { margin-bottom: var(--s-7); }
+  section > h2 {
+    font-size: var(--fs-md);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-accent);
+    border-bottom: 1px solid var(--c-border);
+    padding-bottom: var(--s-2);
+    margin-bottom: var(--s-4);
+  }
+
+  .role { margin-bottom: var(--s-6); }
+  .role-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+  .role-head h3 { font-size: var(--fs-md); }
+  .company { color: var(--c-text-muted); font-weight: 400; }
+  .when {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-muted);
+  }
+  .role-summary {
+    margin-top: var(--s-2);
+    color: var(--c-text-muted);
+  }
+  .role ul {
+    margin-top: var(--s-2);
+  }
+  .role ul li { margin-bottom: var(--s-1); }
+  .stack-line {
+    margin-top: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-dim);
+  }
+  .stack-line .lbl { color: var(--c-text-muted); }
+
+  .cols {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--s-6);
+  }
+  @media (max-width: 640px) {
+    .cols { grid-template-columns: 1fr; }
+    .masthead { flex-direction: column; }
+    .contact { text-align: left; }
+  }
+  .skills dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--c-text-muted);
+    margin-top: var(--s-3);
+  }
+  .skills dd { margin-left: 0; }
+  .skills dt:first-of-type { margin-top: 0; }
+
+  .edu h3 { font-size: var(--fs-md); }
+  .edu p { color: var(--c-text-muted); }
+
+  .proj-line { padding-left: 1.25rem; }
+  .proj-line li { margin-bottom: var(--s-2); }
+  .muted { color: var(--c-text-muted); margin-bottom: var(--s-3); }
+
+  /* Print refinements specific to this page */
+  @media print {
+    .resume { padding: 0; max-width: none; }
+    section { margin-bottom: 1rem; page-break-inside: avoid; }
+    .role { page-break-inside: avoid; margin-bottom: 0.8rem; }
+    section > h2 {
+      border-bottom: 1px solid #999;
+      color: #000;
+    }
+  }
+</style>

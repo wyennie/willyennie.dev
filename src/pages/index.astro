@@ -1,0 +1,151 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '~/layouts/Layout.astro';
+import Pill from '~/components/Pill.astro';
+import ProjectCard from '~/components/ProjectCard.astro';
+import { SITE } from '~/lib/site';
+
+const featured = (await getCollection('projects', (p) => !p.data.draft && p.data.featured))
+  .sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+---
+
+<Layout
+  title=""
+  description="Will Yennie — full-stack engineer based in NYC. Ruby on Rails, TypeScript, Postgres."
+>
+  <section class="hero container">
+    {SITE.available && (
+      <Pill tone="accent" dot>available for hire</Pill>
+    )}
+
+    <h1 class="name">Will Yennie</h1>
+
+    <p class="lede prose">
+      Full-stack engineer in {SITE.location}. I build durable web systems —
+      Ruby on Rails, TypeScript, Postgres — and care most about the parts users
+      never see: clean data models, sharp boundaries, fast feedback loops.
+    </p>
+
+    <div class="cta">
+      <a href={`mailto:${SITE.email}`} class="btn primary">
+        say hello
+        <span class="email">{SITE.email}</span>
+      </a>
+      <a href="/work" class="btn ghost">see work →</a>
+    </div>
+  </section>
+
+  <section class="featured container">
+    <header class="section-head">
+      <h2><span class="hash">#</span> featured work</h2>
+      <a href="/projects" class="see-all">all projects →</a>
+    </header>
+
+    <div class="grid">
+      {featured.map((p) => <ProjectCard project={p} variant="featured" />)}
+    </div>
+  </section>
+
+  <section class="bio container prose">
+    <h2><span class="hash">#</span> the short version</h2>
+    <p>
+      I came to engineering by way of doing the work first — building things that
+      had to ship and stay shipped — then formalizing it through Launch School. I
+      like systems that are simple at the edges and rigorous at the core.
+    </p>
+    <p>
+      Most recently I've been heads-down on side projects after a stretch at
+      <a href="/work#insight">Insight Designs</a>. Before that, a long winding
+      run through small teams where I was usually the one fixing the data layer.
+    </p>
+    <p>
+      Currently looking. <a href={`mailto:${SITE.email}`}>Get in touch</a>.
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    padding-block: var(--s-8) var(--s-7);
+  }
+  .name {
+    margin-top: var(--s-4);
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    letter-spacing: -0.02em;
+  }
+  .lede {
+    margin-top: var(--s-5);
+    font-size: var(--fs-md);
+    color: var(--c-text);
+  }
+  .cta {
+    margin-top: var(--s-6);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: center;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    padding: var(--s-3) var(--s-4);
+    border-radius: var(--r-md);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .btn.primary {
+    background: var(--c-accent);
+    color: var(--c-accent-on);
+  }
+  .btn.primary:hover {
+    background: var(--c-accent-hover);
+    color: var(--c-accent-on);
+    text-decoration: none;
+  }
+  .btn.ghost {
+    color: var(--c-text);
+    border-color: var(--c-border-strong);
+  }
+  .btn.ghost:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+    text-decoration: none;
+  }
+  .email {
+    color: color-mix(in srgb, var(--c-accent-on) 70%, transparent);
+    font-weight: 600;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-5);
+  }
+  .section-head h2 {
+    font-size: var(--fs-lg);
+    color: var(--c-text-muted);
+    font-weight: 500;
+  }
+  .hash { color: var(--c-accent); }
+  .see-all {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+  }
+
+  .featured { padding-block: var(--s-6); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--s-4);
+  }
+
+  .bio { padding-block: var(--s-7); }
+  .bio h2 { font-size: var(--fs-lg); color: var(--c-text-muted); font-weight: 500; margin-bottom: var(--s-4); }
+  .bio p + p { margin-top: var(--s-4); }
+</style>

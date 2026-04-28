@@ -1,0 +1,50 @@
+---
+interface Props {
+  tone?: 'accent' | 'muted' | 'success';
+  dot?: boolean;
+}
+const { tone = 'muted', dot = false } = Astro.props;
+---
+
+<span class:list={['pill', `pill-${tone}`]}>
+  {dot && <span class="dot" aria-hidden="true"></span>}
+  <slot />
+</span>
+
+<style>
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 0.3em 0.7em;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--c-border-strong);
+    background: var(--c-bg-raised);
+    color: var(--c-text-muted);
+  }
+  .pill-accent {
+    border-color: var(--c-accent-dim);
+    color: var(--c-accent);
+    background: color-mix(in srgb, var(--c-accent) 10%, transparent);
+  }
+  .pill-success {
+    border-color: var(--c-accent-dim);
+    color: var(--c-accent);
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+</style>
