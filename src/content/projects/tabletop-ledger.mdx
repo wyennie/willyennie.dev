@@ -1,0 +1,37 @@
+---
+title: "Tabletop Ledger"
+tagline: "Campaign organizer for tabletop RPG game masters: a tree of pages, plus an AI chat that takes whatever page you're on as context."
+role: "Creator; software engineer"
+year: 2025
+stack: ["WebSockets", "AI APIs", "WYSIWYG editor"]
+featured: true
+order: 2
+summary: "A solo-built web app that lets RPG game masters organize a campaign as a tree of pages and ask context-aware questions about whatever they're looking at."
+---
+
+{/* TODO(Will): fill in the specific stack (framework, database, editor library, which AI provider) and add the repo / live URL once you're ready to share. */}
+
+## What it is
+
+A web app for tabletop RPG game masters: the people who prep a session by
+juggling NPCs, locations, factions, plot threads, and three half-finished
+encounter notes. Tabletop Ledger lets you organize all of that as a tree of
+pages with a WYSIWYG editor, and gives you an AI chat that scopes its answers
+to whichever page you're currently viewing.
+
+## What I built
+
+- **Tree-structured page system with a WYSIWYG editor.** Game masters
+  organize a campaign as nested pages: a faction has cities, a city has
+  NPCs, an NPC has a backstory and a session log. Editing happens inline
+  without dropping into a separate editor view.
+- **Context-aware chat panel.** The chat takes the current page as context,
+  so a question about an NPC pulls from that NPC's page rather than the
+  whole campaign. Answers stay scoped, signal stays high.
+- **WebSocket-based streaming for AI responses.** Replies arrive
+  token-by-token over a persistent connection rather than as a single
+  blocking HTTP call, so the UI feels responsive even on long generations.
+- **Beta with real users.** Ran feedback sessions during beta and iterated
+  on UX/UI; measured a 20% lift in user satisfaction across the cycle.
+
+*Built Dec 2024 – Feb 2025.*

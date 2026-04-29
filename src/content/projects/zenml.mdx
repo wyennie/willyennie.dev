@@ -1,37 +1,48 @@
 ---
 title: "ZenML"
-tagline: "Self-hostable workflow engine for ML pipelines, with a focus on reproducibility."
-role: "Contributor"
+tagline: "Built a chatbot feature for the ZenML VSCode extension in collaboration with one of their engineers."
+role: "Open-source contributor (collaborated with ZenML engineering)"
 year: 2024
-stack: ["Python", "TypeScript", "Postgres", "Docker"]
-featured: true
-order: 2
-repo: "https://github.com/wyennie/zenml"
-summary: "A Pythonic pipeline orchestrator: write steps as functions, run them anywhere, get caching and lineage for free."
+stack: ["TypeScript", "JavaScript", "VSCode Extension API", "OpenAI API", "Anthropic Claude API"]
+featured: false
+order: 9
+repo: "https://github.com/zenml-io/vscode-zenml"
+live: "https://www.zenml.io/"
+summary: "Built a chatbot feature for the official ZenML VSCode extension. Natural-language pipeline troubleshooting, built in collaboration with a ZenML engineer. Not merged."
 ---
 
-{/* TODO(Will): refine roles/contributions if this is the open-source ZenML vs. a fork. */}
+## About the project
 
-## What it is
+[ZenML](https://www.zenml.io/) is an open-source MLOps framework built and
+maintained by [zenml-io](https://github.com/zenml-io/), not by me. It models
+each step of an ML pipeline as a versioned, cached, typed function so the same
+pipeline runs locally, on Kubernetes, or against a managed orchestrator
+without changing the step contract.
 
-ZenML treats each step of a machine-learning pipeline as a versioned, cached,
-typed function. Run the same pipeline locally, on a Kubernetes cluster, or
-against a managed orchestrator — the step contract doesn't change, only the
-runner.
+ZenML ships an official VSCode extension that lets you browse, run, and
+inspect pipelines without leaving the editor.
 
 ## What I built
 
-- Authored the artifact-store adapter layer so pipeline outputs could be backed
-  by S3, GCS, or local disk without touching pipeline code.
-- Improved cache-key derivation so steps that only differ by a non-functional
-  change (logging, comments) reuse cached artifacts. Cut typical iteration time
-  on a 12-step pipeline by ~40%.
-- Wrote the migration tooling that moves a project from local file-backed
-  artifacts to a remote object store without losing lineage.
+I built a chatbot feature for the extension in collaboration with one of
+ZenML's engineers, pairing through design and implementation rather than
+sending PRs over the wall.
 
-## Why it's interesting
+- Built a chatbot panel inside the VSCode extension that takes
+  natural-language questions about a pipeline (why a step failed, where
+  caching is or isn't kicking in, how to optimize a run) and answers them
+  with pipeline context attached.
+- Integrated multiple LLM providers (OpenAI's ChatGPT and Anthropic's Claude)
+  behind a single chat interface so users can pick the model.
+- Built the chat UI: dropdowns and interactive controls for selecting
+  pipeline context, plus the state management that keeps that context scoped
+  per conversation.
+- Implemented real-time message streaming so responses arrive token-by-token
+  rather than as a single blocking call, with the UI updating live.
+- Hardened the LLM-call boundary (failed and partial responses, rate
+  limits, provider errors) and surfaced clear feedback in the panel so the
+  failure mode is never a silent hang.
 
-The interesting bit isn't "we built another orchestrator." It's the bet that a
-*function* is the right unit of versioning. Once you commit to that, caching,
-lineage, and reproducibility stop being separate features — they fall out of
-the type system.
+## Status
+
+The feature was built but not merged into the production extension.

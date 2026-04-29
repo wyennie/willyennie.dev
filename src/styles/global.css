@@ -1,12 +1,12 @@
 /* ============================================================
-   willyennie.dev — design tokens + reset
+   willyennie.dev: design tokens + reset
    Dark-only. Mono headers, sans body. Single accent: teal.
    ============================================================ */
 
 :root {
   color-scheme: dark;
 
-  /* Color — neutral scale (perceptual, not literal black) */
+  /* Color (neutral scale, perceptual, not literal black) */
   --c-bg:        #0b0d0e;
   --c-bg-raised: #131618;
   --c-bg-sunken: #08090a;
@@ -190,7 +190,7 @@ hr {
 }
 
 /* ============================================================
-   Print — used by /work to produce a clean resume PDF
+   Print: used by /work to produce a clean resume PDF
    ============================================================ */
 @media print {
   :root {

@@ -1,0 +1,109 @@
+---
+import Layout from '~/layouts/Layout.astro';
+
+const updated = '2026-04-28';
+/* TODO(Will): every section below is a stub. Fill in your actual setup.
+   I deliberately removed all the placeholder gear so nothing on this page
+   claims something that isn't true. */
+---
+
+<Layout
+  title="uses"
+  description="Editor, terminal, hardware, and the rest of Will Yennie's day-to-day setup."
+  noindex
+>
+  <div class="container page prose">
+    <header class="head">
+      <h1>uses</h1>
+      <p class="meta">
+        Updated {updated} · in the spirit of
+        <a href="https://uses.tech" rel="noopener">uses.tech</a>
+      </p>
+    </header>
+
+    <p class="intro">
+      What I actually reach for, not what I'd put in a tweet. Boring on purpose:
+      the stuff that lasted past the new-tool dopamine.
+    </p>
+
+    <p class="todo-banner">
+      🚧 This page is being filled in. Come back soon.
+    </p>
+
+    <h2>Editor</h2>
+    <ul>
+      <li>{/* TODO(Will): your editor + the 1-2 tools / plugins that actually matter */}</li>
+    </ul>
+
+    <h2>Terminal</h2>
+    <ul>
+      <li>{/* TODO(Will): shell, terminal emulator, multiplexer */}</li>
+      <li>{/* TODO(Will): the CLI tools you'd be slower without */}</li>
+    </ul>
+
+    <h2>Languages I reach for</h2>
+    <ul>
+      <li>{/* TODO(Will): default backend language + framework */}</li>
+      <li>{/* TODO(Will): default frontend language + framework */}</li>
+      <li>{/* TODO(Will): default database */}</li>
+    </ul>
+
+    <h2>Hardware</h2>
+    <ul>
+      <li>{/* TODO(Will): laptop */}</li>
+      <li>{/* TODO(Will): monitor / keyboard / mouse if you care */}</li>
+    </ul>
+
+    <h2>Habits</h2>
+    <ul>
+      <li>{/* TODO(Will): one or two practices you'd defend in an interview */}</li>
+    </ul>
+
+    <p class="footnote">
+      Want a recommendation on any of this? <a href="mailto:wryennie@gmail.com">Ask</a>.
+    </p>
+  </div>
+</Layout>
+
+<style>
+  .page { padding-block: var(--s-7) var(--s-8); }
+  .head { margin-bottom: var(--s-5); }
+  .head h1 { font-size: var(--fs-2xl); }
+  .meta {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-text-muted);
+    margin-top: var(--s-2);
+  }
+  .intro {
+    color: var(--c-text-muted);
+    margin-bottom: var(--s-4);
+  }
+  .todo-banner {
+    background: var(--c-bg-raised);
+    border: 1px dashed var(--c-border-strong);
+    border-radius: var(--r-md);
+    padding: var(--s-3) var(--s-4);
+    margin-bottom: var(--s-6);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-text-muted);
+  }
+  h2 {
+    font-size: var(--fs-md);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-accent);
+    margin-top: var(--s-6);
+    margin-bottom: var(--s-3);
+  }
+  ul { padding-left: 1.25rem; }
+  ul li { margin-bottom: var(--s-2); }
+  .footnote {
+    margin-top: var(--s-7);
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    border-top: 1px solid var(--c-border);
+    padding-top: var(--s-4);
+  }
+</style>

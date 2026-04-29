@@ -1,43 +1,68 @@
 ---
 title: "Firefly"
-tagline: "Real-time collaborative debugger for distributed Ruby systems."
-role: "Co-creator, full-stack engineer"
+tagline: "Open-source observability framework for AWS Lambda serverless functions."
+role: "Co-creator, full-stack engineer (4-person team)"
 year: 2023
-stack: ["Ruby", "Rails", "WebSockets", "Redis", "PostgreSQL", "React"]
+stack: ["Node.js", "OpenTelemetry", "AWS Lambda", "Terraform", "Docker", "Promscale / TimescaleDB", "Grafana"]
 featured: true
 order: 1
-repo: "https://github.com/wyennie/firefly"
-summary: "Multi-process Ruby debugger that lets a team step through a single, shared session in real time."
+repo: "https://github.com/try-firefly"
+live: "https://try-firefly.github.io/"
+summary: "Self-hostable telemetry pipeline for AWS Lambda. Automated instrumentation, unified metrics + traces, deployed via Terraform."
 ---
 
-{/* TODO(Will): drop in 1–2 screenshots or a recorded demo gif under /public/projects/firefly/ */}
+> The full case study lives at [try-firefly.github.io](https://try-firefly.github.io/).
+> This page is the short version.
 
 ## What it is
 
-Firefly is a real-time, collaborative debugger built for the kind of distributed
-Ruby systems where the bug only shows up under load — and where the engineer who
-wrote the offending code is not the one staring at production at 2am.
+Firefly is an open-source observability framework for serverless functions. It
+solves a specific problem: serverless workloads are stateless and ephemeral, so
+the usual "install an agent on the box" approach to observability doesn't work,
+and the SaaS replacements get expensive fast (vendor pricing can hit ~50% of
+infrastructure cost).
 
-It exposes a shared debug session over WebSockets so multiple engineers can step
-through the same backtrace at the same time, leaving inline annotations as they
-go.
+Firefly is the middle option: self-hosted, automated to deploy, vendor-neutral.
 
-## What I built
+## Architecture
 
-- Designed the actor-style session protocol that brokers control of the
-  paused process between connected clients (one driver at a time, with hand-offs).
-- Implemented the WebSocket transport layer on top of a Redis pub/sub backbone
-  so sessions survive a single Rails process going down.
-- Built the React-side timeline and breakpoint UI, plus the keyboard-first
-  step/continue/inspect controls.
+Three phases:
 
-## What I'd do differently
+1. **Emit.** AWS Distro for OpenTelemetry (ADOT) Lambda layer auto-instruments
+   functions for traces. Metrics are pushed via CloudWatch Metric Stream →
+   Kinesis Data Firehose, so data leaves the function only when there's data
+   to send (no pull-based polling latency).
+2. **Ship.** A custom OpenTelemetry collector gateway accepts traces and
+   metrics, transforms metrics from CloudWatch JSON into Prometheus format,
+   and writes to a single backend.
+3. **Present.** Promscale (built on TimescaleDB) stores both traces and
+   metrics; Grafana renders pre-built dashboards over Prometheus, Jaeger, and
+   Postgres query interfaces.
 
-- Lean harder on existing debugger primitives (DAP) instead of rolling our own
-  protocol — we wrote a lot of plumbing that off-the-shelf tooling now covers.
-- Cache fewer things in Redis. We treated it as a database and paid for it.
+## What I worked on
 
-## Status
+{/* TODO(Will): tighten this to specifically what *you* owned vs. what the team owned. The case study is team-attributed; this section should be your slice. */}
 
-Sunset as a product, kept around as a teaching artifact. The architecture writeup
-is the part still worth reading.
+- Context propagation across event-based Lambda invocations: reconfigured ADOT
+  to use the W3C TraceContext protocol instead of AWS X-Ray headers, and built
+  a wrapper layer that intercepts requests to extract `traceparent` headers
+  from non-standard locations.
+- A custom wrapper for AWS SDK Lambda invocations that injects `traceparent`
+  into the invocation payload: the missing piece for tracing across function
+  boundaries.
+- Database selection: pushed for Promscale over Amazon Timestream after
+  benchmarking (5-175x faster reads, ~6000x higher insert throughput, ~220x
+  cheaper for our workload, and cloud-agnostic).
+
+## What we explicitly didn't build
+
+- Logs. Too granular for the framework's value proposition; left to existing
+  CloudWatch tooling.
+- Non-Node.js or non-AWS support. Future scope, not v1.
+
+## Team
+
+Built with Julia Park (Toronto), Marcus Sinkinson (Amsterdam), and Carolina
+Avila (NY) as a Launch School capstone project. The case study credits the
+team collectively; specifics on who-owned-what are in the writeup linked
+above.

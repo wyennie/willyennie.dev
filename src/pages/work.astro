@@ -2,57 +2,74 @@
 import Layout from '~/layouts/Layout.astro';
 import { SITE } from '~/lib/site';
 
+/* TODO(Will): walk this list and prune anything you wouldn't want to be
+   asked about in a technical interview. The current list is what shows up
+   across willyennie.com + your projects + likely Insight Designs work; some
+   of it (Sidekiq, Redis, GraphQL, Stimulus, Astro, Vite) is plausible but
+   not directly evidenced in the public sources. Cut what isn't real. */
 const skills = {
   Languages: ['Ruby', 'TypeScript', 'JavaScript', 'SQL', 'Bash'],
-  'Backend & data': ['Ruby on Rails', 'Sidekiq', 'PostgreSQL', 'Redis', 'GraphQL', 'REST'],
-  Frontend: ['React', 'Astro', 'Stimulus', 'CSS / CSS Modules', 'Vite'],
-  Infra: ['Docker', 'GitHub Actions', 'nginx', 'DigitalOcean', 'AWS (S3, RDS, EC2)'],
-  Practice: ['TDD', 'systems design', 'incident response', 'mentorship'],
+  'Backend & data': ['Ruby on Rails', 'Sinatra', 'Node.js / Express', 'PostgreSQL', 'MongoDB', 'REST'],
+  Frontend: ['React', 'Handlebars', 'ERB', 'CSS', 'Astro'],
+  Infra: ['Docker', 'Terraform', 'AWS (Lambda, Kinesis Firehose, CloudWatch)', 'DigitalOcean', 'nginx'],
+  Observability: ['OpenTelemetry', 'Grafana', 'Prometheus', 'Promscale / TimescaleDB'],
+  Practice: ['TDD', 'systems design', 'mastery-based learning'],
 };
 
-const roles = [
+type Role = {
+  company: string;
+  title: string;
+  location: string;
+  start: Date;
+  end: Date | 'present';
+  summary: string;
+  bullets: string[];
+  stack: string[];
+  anchor: string;
+};
+
+const fmtDate = (d: Date | 'present') =>
+  d === 'present'
+    ? 'present'
+    : d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+/* Sources: LinkedIn (Insight Designs, Boulder CO, confirmed) + willyennie.com.
+   Specific dates / job title / responsibilities are NOT publicly visible.
+   Fill in from your own records. Do not invent. */
+const roles: Role[] = [
   {
-    company: 'Insight Designs Web Services',
-    title: 'Software Engineer', // TODO(Will): confirm exact title
-    location: 'Remote',
-    start: '20XX', // TODO(Will): fill
-    end: '2026',
-    summary: 'TODO(Will): one-line summary of what Insight Designs does and your scope there.',
+    company: 'Insight Designs Web Solutions',
+    title: 'Software Engineer', // HR title was "Programmer"; function was software engineering.
+    location: 'Boulder, CO (remote)',
+    start: new Date(2025, 1), // February 2025
+    end: new Date(2026, 3),   // April 2026
+    summary:
+      'Full-stack and infrastructure work for a Boulder-based web design consultancy with 600+ clients across its portfolio.',
     bullets: [
-      'TODO(Will): 2–4 specific things shipped — feature, system, migration, savings, etc.',
-      'TODO(Will): a metric if you have one (perf win, infra cost, MTTR, etc.).',
-      'TODO(Will): mentorship, code review, hiring, on-call — anything cross-cutting.',
+      'Worked across client websites for a consultancy with 600+ clients. Broad exposure to varied codebases, stacks, and product surfaces in a single role.',
+      'Built out new client sites end-to-end, from spec through deploy.',
+      'Owned ongoing maintenance and security updates across DigitalOcean-hosted production environments: the durable, behind-the-scenes work of keeping client sites running between feature engagements.',
     ],
-    stack: ['Rails', 'PostgreSQL', 'JavaScript', 'AWS'],
+    /* Stack inferred from Insight's published specialties (Certified Shopify
+       Partner, "hundreds of custom WordPress site builds," Magento-certified
+       developers) plus your explicit confirmation of building client sites
+       and DigitalOcean server maintenance. TODO(Will): prune anything you
+       didn't personally touch. */
+    stack: ['Shopify / Liquid', 'WordPress / PHP', 'JavaScript', 'HTML / CSS', 'DigitalOcean'],
     anchor: 'insight',
-  },
-  {
-    company: 'Independent / freelance',
-    title: 'Full-stack developer',
-    location: 'NYC',
-    start: '2020',
-    end: '20XX', // TODO(Will): fill (year you joined Insight)
-    summary: 'Worked with small teams and solo founders on production Rails/TypeScript apps.',
-    bullets: [
-      'Designed and shipped backends for early-stage products across e-commerce, scheduling, and content tooling.',
-      'Owned the boring-but-critical work: schema, background jobs, cache invalidation, deploy scripts.',
-      'Took several apps from "demo" to "responsibly running in production" — monitoring, backups, on-call runbooks.',
-    ],
-    stack: ['Rails', 'TypeScript', 'Postgres', 'Sidekiq', 'Docker'],
-    anchor: 'freelance',
   },
 ];
 
 const education = [
   {
     name: 'Launch School',
-    detail: 'Capstone graduate. Mastery-based core + capstone in distributed systems and full-stack apps.',
-    year: '20XX', // TODO(Will): fill
+    detail: 'Capstone graduate. Multi-year mastery-based program: fundamentals (OOP, data structures, networking, REST, databases) plus a capstone in advanced algorithms, system design, and just-in-time learning.',
+    year: 2023, /* TODO(Will): real graduation year */
   },
 ];
 ---
 
-<Layout title="work" description="Will Yennie — résumé, roles, and stack." bodyClass="work-page">
+<Layout title="work" description="Will Yennie résumé, roles, and stack." bodyClass="work-page">
   <article class="container resume">
     <header class="masthead">
       <div>
@@ -77,10 +94,11 @@ const education = [
     <section>
       <h2>Summary</h2>
       <p>
-        Engineer with deep Rails + Postgres roots and a working command of the
-        TypeScript/React side of the stack. I'm at my best on systems where
-        correctness and durability matter — payment flows, auth, scheduling,
-        anything where being subtly wrong is worse than being slow.
+        Full-stack engineer focused on the durable, less-visible parts of web
+        systems: data models, background jobs, the boundaries between
+        services. Comfortable across Ruby on Rails, TypeScript, and SQL/NoSQL;
+        recent work on serverless observability (Firefly) and AI integrations
+        in developer tooling (ZenML).
       </p>
     </section>
 
@@ -90,7 +108,7 @@ const education = [
         <article class="role" id={r.anchor}>
           <header class="role-head">
             <h3>{r.title} · <span class="company">{r.company}</span></h3>
-            <span class="when">{r.start} — {r.end} · {r.location}</span>
+            <span class="when">{fmtDate(r.start)} – {fmtDate(r.end)} · {r.location}</span>
           </header>
           <p class="role-summary">{r.summary}</p>
           <ul>
@@ -134,10 +152,10 @@ const education = [
         Full case studies at <a href="/projects">willyennie.dev/projects</a>.
       </p>
       <ul class="proj-line">
-        <li><strong>Firefly</strong> — collaborative real-time debugger for distributed Ruby systems.</li>
-        <li><strong>ZenML</strong> — function-as-step ML pipeline orchestrator with caching and lineage.</li>
-        <li><strong>HookScope</strong> — static analyzer for unsafe React hook usage.</li>
-        <li><strong>FlightWise / TaskVault / ShopSense</strong> — earlier work on flight search, encrypted task logs, ledger-based commerce.</li>
+        <li><strong>Firefly</strong>: open-source observability framework for AWS Lambda. Node.js, OpenTelemetry, Promscale, Grafana. <em>Co-creator (4-person team).</em></li>
+        <li><strong>Tabletop Ledger</strong>: solo-built campaign organizer for tabletop RPG game masters; tree of pages, WYSIWYG editor, context-aware AI chat with WebSocket streaming.</li>
+        <li><strong>HookScope</strong>: webhook debugger; capture, inspect, and replay incoming webhooks against a local handler.</li>
+        <li><strong>FlightWise / TaskVault / ShopSense</strong>: earlier full-stack work on flight visualization, task tracking, and e-commerce.</li>
       </ul>
     </section>
   </article>

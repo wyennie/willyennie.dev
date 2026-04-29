@@ -1,16 +1,16 @@
 ---
 title: "FlightWise"
-tagline: "A flight-search aggregator that prices in time, not just dollars."
-year: 2021
-stack: ["Ruby on Rails", "Postgres", "Sidekiq"]
+tagline: "Web application for tracking and visualizing flight paths from specific airlines and airports."
+year: 2022
+stack: ["React", "Node.js", "Express", "MongoDB"]
 featured: false
 order: 11
-summary: "Ranks itineraries by total trip cost — including layovers, ground transit, and the productivity tax of redeyes."
+summary: "Web application for tracking and visualizing flight paths from specific airlines and airports."
 ---
 
-Most flight search engines optimize for the headline price. FlightWise asked a
-different question: if you actually counted the hours a trip costs you, which
-itinerary wins?
+A web application for tracking and visualizing flight paths from specific
+airlines and airports.
 
-Backend-heavy: a Sidekiq fan-out scrapes provider APIs in parallel, normalizes
-schedules, and produces a single time-weighted ranking.
+Built with React, Node.js, Express, and MongoDB.
+
+{/* TODO(Will): if there's a repo, screenshot, or specific story worth sharing here, add it. */}

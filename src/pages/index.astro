@@ -11,7 +11,7 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
 
 <Layout
   title=""
-  description="Will Yennie — full-stack engineer based in NYC. Ruby on Rails, TypeScript, Postgres."
+  description="Will Yennie, full-stack engineer based in NYC. Ruby on Rails, TypeScript, Postgres."
 >
   <section class="hero container">
     {SITE.available && (
@@ -21,8 +21,8 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
     <h1 class="name">Will Yennie</h1>
 
     <p class="lede prose">
-      Full-stack engineer in {SITE.location}. I build durable web systems —
-      Ruby on Rails, TypeScript, Postgres — and care most about the parts users
+      Full-stack engineer in {SITE.location}. I build durable web systems with
+      Ruby on Rails, TypeScript, and Postgres. I care most about the parts users
       never see: clean data models, sharp boundaries, fast feedback loops.
     </p>
 
@@ -33,6 +33,28 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
       </a>
       <a href="/work" class="btn ghost">see work →</a>
     </div>
+  </section>
+
+  <section class="fit container">
+    <h2><span class="hash">#</span> a fit if you're hiring for</h2>
+    <dl class="fit-list">
+      <div class="fit-row">
+        <dt>role</dt>
+        <dd>senior full-stack on a small team (Rails, TypeScript, or both)</dd>
+      </div>
+      <div class="fit-row">
+        <dt>where</dt>
+        <dd>{SITE.location}. Remote or hybrid; comfortable across US/EU hours</dd>
+      </div>
+      <div class="fit-row">
+        <dt>work</dt>
+        <dd>product surface where the data model is the hard part (payments, scheduling, anything correctness-sensitive)</dd>
+      </div>
+      <div class="fit-row">
+        <dt>start</dt>
+        <dd>available now</dd>
+      </div>
+    </dl>
   </section>
 
   <section class="featured container">
@@ -49,14 +71,15 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
   <section class="bio container prose">
     <h2><span class="hash">#</span> the short version</h2>
     <p>
-      I came to engineering by way of doing the work first — building things that
-      had to ship and stay shipped — then formalizing it through Launch School. I
-      like systems that are simple at the edges and rigorous at the core.
+      I came to engineering through Launch School's multi-year, mastery-based
+      program. Fundamentals first (data structures, networking, REST,
+      databases), then a capstone in system design and distributed systems.
     </p>
     <p>
-      Most recently I've been heads-down on side projects after a stretch at
-      <a href="/work#insight">Insight Designs</a>. Before that, a long winding
-      run through small teams where I was usually the one fixing the data layer.
+      The capstone shipped as <a href="/projects/firefly">Firefly</a>, a
+      four-person open-source observability framework for AWS Lambda. Most of
+      my professional work since then has been at
+      <a href="/work#insight">Insight Designs</a>, a Boulder web agency.
     </p>
     <p>
       Currently looking. <a href={`mailto:${SITE.email}`}>Get in touch</a>.
@@ -136,6 +159,38 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
   .see-all {
     font-family: var(--font-mono);
     font-size: var(--fs-sm);
+  }
+
+  .fit { padding-block: var(--s-5) var(--s-6); }
+  .fit h2 {
+    font-size: var(--fs-lg);
+    color: var(--c-text-muted);
+    font-weight: 500;
+    margin-bottom: var(--s-4);
+  }
+  .fit-list {
+    display: grid;
+    gap: var(--s-2);
+    margin: 0;
+    border-left: 1px solid var(--c-border);
+    padding-left: var(--s-4);
+  }
+  .fit-row {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+  }
+  .fit-row dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--c-accent);
+  }
+  .fit-row dd { margin: 0; color: var(--c-text); }
+  @media (max-width: 540px) {
+    .fit-row { grid-template-columns: 1fr; gap: var(--s-1); }
   }
 
   .featured { padding-block: var(--s-6); }

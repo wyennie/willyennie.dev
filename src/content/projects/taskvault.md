@@ -1,16 +1,15 @@
 ---
 title: "TaskVault"
-tagline: "Encrypted, append-only task log for people who don't trust task apps."
+tagline: "A task tracking web app with a RESTful API."
 year: 2021
-stack: ["Rails", "Postgres", "libsodium"]
+stack: ["Ruby", "Sinatra", "ERB", "PostgreSQL"]
 featured: false
 order: 12
-summary: "Tasks as an append-only event log, encrypted at rest with per-user keys."
+summary: "A task tracking web app with a RESTful API."
 ---
 
-A small experiment in modeling todo items as events rather than rows. Editing
-a task appends a new event; the current state is a fold over the log. Nice
-side effect: an undo history falls out for free.
+A task tracking web app with a RESTful API.
 
-The encryption layer was less interesting than the data model — but it kept
-me honest about which fields actually needed to be queryable.
+Built with Ruby, Sinatra, ERB, and PostgreSQL.
+
+{/* TODO(Will): if there's a repo, screenshot, or specific story worth sharing here, add it. */}

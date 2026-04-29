@@ -8,7 +8,7 @@ const isActive = (href: string) =>
 
 <header class="site-header">
   <div class="container row">
-    <a href="/" class="brand" aria-label={`${SITE.name} — home`}>
+    <a href="/" class="brand" aria-label={`${SITE.name}, home`}>
       <span class="brand-mark">wy</span>
       <span class="brand-name">{SITE.name}</span>
     </a>
@@ -26,6 +26,16 @@ const isActive = (href: string) =>
             </a>
           </li>
         ))}
+        <li class="cmd-li">
+          <button
+            type="button"
+            class="cmd-hint"
+            data-cmdk-open
+            aria-label="Open command palette"
+          >
+            <kbd class="mac">⌘</kbd><kbd class="win">Ctrl</kbd><kbd>K</kbd>
+          </button>
+        </li>
       </ul>
     </nav>
   </div>
@@ -88,9 +98,39 @@ const isActive = (href: string) =>
   .nav-link:hover { color: var(--c-text); text-decoration: none; }
   .nav-link.active { color: var(--c-accent); }
 
+  .cmd-li { display: inline-flex; }
+  .cmd-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: var(--s-1) var(--s-2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+    background: var(--c-bg-raised);
+    color: var(--c-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .cmd-hint:hover {
+    color: var(--c-text);
+    border-color: var(--c-accent-dim);
+  }
+  .cmd-hint kbd {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+  :global(html[data-platform="mac"]) .cmd-hint .win { display: none; }
+  :global(html[data-platform="win"]) .cmd-hint .mac { display: none; }
+  :global(html:not([data-platform])) .cmd-hint .win { display: none; }
+
   @media (max-width: 540px) {
     .brand-name { display: none; }
     nav ul { gap: var(--s-2); }
     .nav-link { padding: var(--s-1); }
+    .cmd-li { display: none; }
   }
 </style>

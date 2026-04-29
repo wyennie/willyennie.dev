@@ -1,17 +1,16 @@
 ---
 title: "HookScope"
-tagline: "A static analyzer that flags unsafe React hook usage before it ships."
+tagline: "A database-backed web application for inspecting and debugging webhooks."
 year: 2022
-stack: ["TypeScript", "AST", "ESLint"]
+stack: ["Node.js", "Express", "Handlebars", "PostgreSQL", "Ngrok"]
 featured: false
 order: 10
-summary: "Catches the common useEffect / useMemo footguns by walking the AST instead of pattern-matching."
+summary: "A database-backed web application for inspecting and debugging webhooks."
 ---
 
-A weekend tool that became an internal lint rule. It checks for the cluster of
-React-hook mistakes that pass type checks but fail at runtime: stale closures
-over state, dependency arrays that lie, effects that fire on every render.
+A database-backed web application for inspecting and debugging webhooks
+("hooks" as in *webhooks*, not React hooks).
 
-The trick is not the rules — most of them already exist somewhere — but
-running them as a single pass over a project's AST so the report comes back
-in seconds rather than as ESLint noise per file.
+Built with Node.js, Express, Handlebars, Ngrok, and PostgreSQL.
+
+{/* TODO(Will): if there's a repo, screenshot, or specific story worth sharing here, add it. */}

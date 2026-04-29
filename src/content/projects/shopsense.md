@@ -1,16 +1,15 @@
 ---
 title: "ShopSense"
-tagline: "Headless commerce backend with a sane inventory model."
-year: 2020
-stack: ["Rails", "Postgres", "GraphQL"]
+tagline: "An e-commerce shopping cart application."
+year: 2021
+stack: ["React", "Express", "Node.js", "MongoDB"]
 featured: false
 order: 13
-summary: "An e-commerce backend that treats inventory as a ledger, not a counter."
+summary: "An e-commerce shopping cart application."
 ---
 
-Inventory bugs are almost always race conditions disguised as integer columns.
-ShopSense models stock as a double-entry ledger: every reservation, sale, and
-restock is a row, and the available count is a view. Slower writes; correct
-numbers under concurrent checkout.
+An e-commerce shopping cart application.
 
-GraphQL on the front, Rails service objects in the middle.
+Built with React, Express, Node.js, and MongoDB.
+
+{/* TODO(Will): if there's a repo, screenshot, or specific story worth sharing here, add it. */}

@@ -7,13 +7,14 @@ const items = [
   { kind: 'route', id: 'go-projects', label: 'Projects',        hint: '/projects', href: '/projects' },
   { kind: 'route', id: 'go-writing',  label: 'Writing',         hint: '/writing',  href: '/writing' },
   { kind: 'route', id: 'go-now',      label: 'Now',             hint: '/now',      href: '/now' },
-  { kind: 'project', id: 'p-firefly',   label: 'Firefly',     hint: 'project', href: '/projects/firefly' },
-  { kind: 'project', id: 'p-zenml',     label: 'ZenML',       hint: 'project', href: '/projects/zenml' },
-  { kind: 'project', id: 'p-hookscope', label: 'HookScope',   hint: 'project', href: '/projects/hookscope' },
-  { kind: 'project', id: 'p-flightwise',label: 'FlightWise',  hint: 'project', href: '/projects/flightwise' },
-  { kind: 'project', id: 'p-taskvault', label: 'TaskVault',   hint: 'project', href: '/projects/taskvault' },
-  { kind: 'project', id: 'p-shopsense', label: 'ShopSense',   hint: 'project', href: '/projects/shopsense' },
-  { kind: 'action', id: 'a-email',    label: `Email — ${SITE.email}`, hint: 'mailto', href: `mailto:${SITE.email}` },
+  { kind: 'project', id: 'p-firefly',   label: 'Firefly',         hint: 'project', href: '/projects/firefly' },
+  { kind: 'project', id: 'p-tabletop',  label: 'Tabletop Ledger', hint: 'project', href: '/projects/tabletop-ledger' },
+  { kind: 'project', id: 'p-zenml',     label: 'ZenML',           hint: 'project', href: '/projects/zenml' },
+  { kind: 'project', id: 'p-hookscope', label: 'HookScope',       hint: 'project', href: '/projects/hookscope' },
+  { kind: 'project', id: 'p-flightwise',label: 'FlightWise',      hint: 'project', href: '/projects/flightwise' },
+  { kind: 'project', id: 'p-taskvault', label: 'TaskVault',       hint: 'project', href: '/projects/taskvault' },
+  { kind: 'project', id: 'p-shopsense', label: 'ShopSense',       hint: 'project', href: '/projects/shopsense' },
+  { kind: 'action', id: 'a-email',    label: `Email: ${SITE.email}`, hint: 'mailto', href: `mailto:${SITE.email}` },
   { kind: 'action', id: 'a-github',   label: 'GitHub',                 hint: 'external', href: SITE.github },
   { kind: 'action', id: 'a-linkedin', label: 'LinkedIn',               hint: 'external', href: SITE.linkedin },
   { kind: 'action', id: 'a-rss',      label: 'RSS',                    hint: 'feed', href: '/rss.xml' },
@@ -158,6 +159,12 @@ const items = [
 
     trigger.addEventListener('click', open);
     closeBtn.addEventListener('click', close);
+    document.querySelectorAll<HTMLElement>('[data-cmdk-open]').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        open();
+      });
+    });
     dialog.addEventListener('click', (e) => {
       if (e.target === dialog) close();
     });
