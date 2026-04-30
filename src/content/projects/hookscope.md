@@ -13,4 +13,4 @@ A database-backed web application for inspecting and debugging webhooks
 
 Built with Node.js, Express, Handlebars, Ngrok, and PostgreSQL.
 
-{/* TODO(Will): if there's a repo, screenshot, or specific story worth sharing here, add it. */}
+![HookScope: webhook bin showing a captured GET request with headers and body](/projects/hookscope.png)

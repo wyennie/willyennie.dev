@@ -12,4 +12,4 @@ An e-commerce shopping cart application.
 
 Built with React, Express, Node.js, and MongoDB.
 
-{/* TODO(Will): if there's a repo, screenshot, or specific story worth sharing here, add it. */}
+![ShopSense: shopping cart with product listing below](/projects/shoppingcart.png)

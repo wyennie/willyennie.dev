@@ -12,4 +12,4 @@ A task tracking web app with a RESTful API.
 
 Built with Ruby, Sinatra, ERB, and PostgreSQL.
 
-{/* TODO(Will): if there's a repo, screenshot, or specific story worth sharing here, add it. */}
+![TaskVault: grocery list with checked-off items and an input to add new todos](/projects/todo_list_cropped.png)

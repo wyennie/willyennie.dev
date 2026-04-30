@@ -13,4 +13,4 @@ airlines and airports.
 
 Built with React, Node.js, Express, and MongoDB.
 
-{/* TODO(Will): if there's a repo, screenshot, or specific story worth sharing here, add it. */}
+![FlightWise: world map showing airline routes between airports](/projects/airline_routes.png)
