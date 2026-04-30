@@ -5,7 +5,7 @@ export const SITE = {
   url: 'https://willyennie.dev',
   description:
     'Will Yennie, full-stack engineer based in NYC. Personal site, work, projects.',
-  email: 'wryennie@gmail.com',
+  email: 'will@willyennie.dev',
   github: 'https://github.com/wyennie',
   linkedin: 'https://www.linkedin.com/in/will-yennie',
   location: 'New York, NY',

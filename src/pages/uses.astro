@@ -1,5 +1,6 @@
 ---
 import Layout from '~/layouts/Layout.astro';
+import { SITE } from '~/lib/site';
 
 const updated = '2026-04-28';
 /* TODO(Will): every section below is a stub. Fill in your actual setup.
@@ -60,7 +61,7 @@ const updated = '2026-04-28';
     </ul>
 
     <p class="footnote">
-      Want a recommendation on any of this? <a href="mailto:wryennie@gmail.com">Ask</a>.
+      Want a recommendation on any of this? <a href={`mailto:${SITE.email}`}>Ask</a>.
     </p>
   </div>
 </Layout>
