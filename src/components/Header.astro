@@ -6,7 +6,7 @@ const isActive = (href: string) =>
   href === '/' ? pathname === '/' : pathname.startsWith(href);
 ---
 
-<header class="site-header">
+<header class="site-header no-print">
   <div class="container row">
     <a href="/" class="brand" aria-label={`${SITE.name}, home`}>
       <span class="brand-mark">wy</span>

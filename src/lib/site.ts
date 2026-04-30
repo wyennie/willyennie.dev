@@ -4,10 +4,10 @@ export const SITE = {
   domain: 'willyennie.dev',
   url: 'https://willyennie.dev',
   description:
-    'Will Yennie, full-stack engineer (Ruby on Rails, TypeScript, Postgres). Personal site, work, projects.',
+    'Will Yennie, full-stack engineer based in NYC. Personal site, work, projects.',
   email: 'wryennie@gmail.com',
   github: 'https://github.com/wyennie',
-  linkedin: 'https://www.linkedin.com/in/william-yennie',
+  linkedin: 'https://www.linkedin.com/in/will-yennie',
   location: 'New York, NY',
   available: true,
 } as const;

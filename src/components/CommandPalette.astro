@@ -126,6 +126,10 @@ const items = [
 
     const navigate = (item: Item) => {
       close();
+      if (item.id === 'a-print' && window.location.pathname === '/work') {
+        window.print();
+        return;
+      }
       if (item.href.startsWith('http') || item.href.startsWith('mailto:')) {
         window.location.href = item.href;
       } else {

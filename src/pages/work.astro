@@ -8,8 +8,8 @@ import { SITE } from '~/lib/site';
    of it (Sidekiq, Redis, GraphQL, Stimulus, Astro, Vite) is plausible but
    not directly evidenced in the public sources. Cut what isn't real. */
 const skills = {
-  Languages: ['Ruby', 'TypeScript', 'JavaScript', 'SQL', 'Bash'],
-  'Backend & data': ['Ruby on Rails', 'Sinatra', 'Node.js / Express', 'PostgreSQL', 'MongoDB', 'REST'],
+  Languages: ['JavaScript', 'TypeScript', 'Ruby', 'PHP', 'Python', 'Go', 'SQL', 'Bash'],
+  'Backend & data': ['Node.js / Express', 'Rails', 'Sinatra', 'PostgreSQL', 'MongoDB', 'REST'],
   Frontend: ['React', 'Handlebars', 'ERB', 'CSS', 'Astro'],
   Infra: ['Docker', 'Terraform', 'AWS (Lambda, Kinesis Firehose, CloudWatch)', 'DigitalOcean', 'nginx'],
   Observability: ['OpenTelemetry', 'Grafana', 'Prometheus', 'Promscale / TimescaleDB'],
@@ -22,6 +22,7 @@ type Role = {
   location: string;
   start: Date;
   end: Date | 'present';
+  displayDate?: string;
   summary: string;
   bullets: string[];
   stack: string[];
@@ -33,38 +34,65 @@ const fmtDate = (d: Date | 'present') =>
     ? 'present'
     : d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
-/* Sources: LinkedIn (Insight Designs, Boulder CO, confirmed) + willyennie.com.
-   Specific dates / job title / responsibilities are NOT publicly visible.
-   Fill in from your own records. Do not invent. */
+const fmtRange = (r: Role) =>
+  r.displayDate ?? `${fmtDate(r.start)} – ${fmtDate(r.end)}`;
+
 const roles: Role[] = [
   {
     company: 'Insight Designs Web Solutions',
-    title: 'Software Engineer', // HR title was "Programmer"; function was software engineering.
+    title: 'Software Engineer',
     location: 'Boulder, CO (remote)',
-    start: new Date(2025, 1), // February 2025
-    end: new Date(2026, 3),   // April 2026
+    start: new Date(2025, 1),
+    end: new Date(2026, 3),
     summary:
       'Full-stack and infrastructure work for a Boulder-based web design consultancy with 600+ clients across its portfolio.',
     bullets: [
-      'Worked across client websites for a consultancy with 600+ clients. Broad exposure to varied codebases, stacks, and product surfaces in a single role.',
-      'Built out new client sites end-to-end, from spec through deploy.',
-      'Owned ongoing maintenance and security updates across DigitalOcean-hosted production environments: the durable, behind-the-scenes work of keeping client sites running between feature engagements.',
+      'Initiated company plugin development with a Google Reviews integration (Google Places API), letting clients embed Google Business reviews on their sites.',
+      'Built a Python tool to automate vulnerability monitoring across 100+ WordPress installations, aggregating security plugin data to flag outdated or compromised plugins.',
+      'Hardened DigitalOcean infrastructure for 40+ client websites: security updates (Apache, MySQL), SSL provisioning, and monitoring.',
     ],
-    /* Stack inferred from Insight's published specialties (Certified Shopify
-       Partner, "hundreds of custom WordPress site builds," Magento-certified
-       developers) plus your explicit confirmation of building client sites
-       and DigitalOcean server maintenance. TODO(Will): prune anything you
-       didn't personally touch. */
     stack: ['Shopify / Liquid', 'WordPress / PHP', 'JavaScript', 'HTML / CSS', 'DigitalOcean'],
     anchor: 'insight',
+  },
+  {
+    company: 'ZenML',
+    title: 'Open-source contributor',
+    location: 'Remote',
+    start: new Date(2024, 5),
+    end: new Date(2024, 9),
+    summary: 'Built a chatbot feature for the official ZenML VSCode extension.',
+    bullets: [
+      'Integrated OpenAI and Anthropic Claude APIs for context-aware chat scoped to the user\'s selected ML pipeline.',
+      'Built the chat UI: dropdowns, interactive controls, per-conversation context selection, and state management.',
+      'Implemented token-by-token message streaming so responses arrive live instead of as a single blocking call.',
+    ],
+    stack: ['TypeScript', 'VSCode Extension API', 'OpenAI API', 'Anthropic Claude API'],
+    anchor: 'zenml',
+  },
+  {
+    company: 'Firefly',
+    title: 'Software Engineer, co-creator',
+    location: 'Remote, 4-person team',
+    start: new Date(2022, 9),
+    end: new Date(2023, 1),
+    summary:
+      'Open-source observability framework for AWS Lambda. Serverless function health via metrics and traces.',
+    bullets: [
+      'Implemented W3C TraceContext propagation across asynchronous Lambda invocations, fixing trace accuracy for cross-function event flows.',
+      'Built a custom OpenTelemetry collector handling up to 500,000 metrics and trace data points per day.',
+      'Architected a telemetry pipeline using OpenTelemetry and Promscale; 30% faster data retrieval for performance queries.',
+      'Built a CLI tool to automate Lambda instrumentation and AWS infrastructure setup, cutting setup time by up to 40 hours.',
+    ],
+    stack: ['Node.js', 'OpenTelemetry', 'AWS Lambda', 'Terraform', 'Docker', 'Promscale / TimescaleDB', 'Grafana'],
+    anchor: 'firefly',
   },
 ];
 
 const education = [
   {
     name: 'Launch School',
-    detail: 'Capstone graduate. Multi-year mastery-based program: fundamentals (OOP, data structures, networking, REST, databases) plus a capstone in advanced algorithms, system design, and just-in-time learning.',
-    year: 2023, /* TODO(Will): real graduation year */
+    detail: 'Full Stack Web Development. Multi-year mastery-based program. Core: OOP, data structures, networking, REST, databases. Capstone: advanced algorithms, system design.',
+    years: '2021 – 2023',
   },
 ];
 ---
@@ -74,31 +102,29 @@ const education = [
     <header class="masthead">
       <div>
         <h1>Will Yennie</h1>
-        <p class="subtitle">Full-stack engineer · Ruby on Rails · TypeScript · Postgres</p>
       </div>
       <ul class="contact">
+        <li><a href={SITE.url}>{SITE.domain}</a></li>
         <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
         <li>{SITE.location}</li>
-        <li><a href={SITE.linkedin}>linkedin.com/in/william-yennie</a></li>
+        <li><a href={SITE.linkedin}>linkedin.com/in/will-yennie</a></li>
         <li><a href={SITE.github}>{SITE.github.replace('https://', '')}</a></li>
       </ul>
     </header>
 
-    <div class="print-hint no-print">
+    <div id="print" class="print-hint no-print">
       <p>
-        Want a PDF? <kbd>⌘</kbd> / <kbd>Ctrl</kbd> + <kbd>P</kbd> &rarr; <em>Save as PDF</em>.
-        This page is print-styled.
+        <a href="/Will_Yennie_Resume.pdf" class="download-link" download>Download PDF</a>
+        or press <kbd>⌘</kbd> / <kbd>Ctrl</kbd> + <kbd>P</kbd> to print this page.
       </p>
     </div>
 
     <section>
       <h2>Summary</h2>
       <p>
-        Full-stack engineer focused on the durable, less-visible parts of web
-        systems: data models, background jobs, the boundaries between
-        services. Comfortable across Ruby on Rails, TypeScript, and SQL/NoSQL;
-        recent work on serverless observability (Firefly) and AI integrations
-        in developer tooling (ZenML).
+        Full-stack engineer who builds new things and fixes old things. I
+        like puzzles, hard bugs, and going deep. Comfortable across
+        JavaScript, TypeScript, Ruby, PHP, Python, Go, and SQL/NoSQL.
       </p>
     </section>
 
@@ -108,7 +134,7 @@ const education = [
         <article class="role" id={r.anchor}>
           <header class="role-head">
             <h3>{r.title} · <span class="company">{r.company}</span></h3>
-            <span class="when">{fmtDate(r.start)} – {fmtDate(r.end)} · {r.location}</span>
+            <span class="when">{fmtRange(r)} · {r.location}</span>
           </header>
           <p class="role-summary">{r.summary}</p>
           <ul>
@@ -140,26 +166,36 @@ const education = [
           <article class="edu">
             <h3>{e.name}</h3>
             <p>{e.detail}</p>
-            <p class="when">{e.year}</p>
+            <p class="when">{e.years}</p>
           </article>
         ))}
       </div>
     </section>
 
     <section>
-      <h2>Selected projects</h2>
-      <p class="muted">
+      <h2>Projects</h2>
+      <p class="muted no-print">
         Full case studies at <a href="/projects">willyennie.dev/projects</a>.
       </p>
       <ul class="proj-line">
-        <li><strong>Firefly</strong>: open-source observability framework for AWS Lambda. Node.js, OpenTelemetry, Promscale, Grafana. <em>Co-creator (4-person team).</em></li>
-        <li><strong>Tabletop Ledger</strong>: solo-built campaign organizer for tabletop RPG game masters; tree of pages, WYSIWYG editor, context-aware AI chat with WebSocket streaming.</li>
-        <li><strong>HookScope</strong>: webhook debugger; capture, inspect, and replay incoming webhooks against a local handler.</li>
-        <li><strong>FlightWise / TaskVault / ShopSense</strong>: earlier full-stack work on flight visualization, task tracking, and e-commerce.</li>
+        <li><strong>Tabletop Ledger</strong> <em>(2025)</em>: solo-built campaign organizer for tabletop RPG game masters. Tree of pages with a WYSIWYG editor, plus a context-aware AI chat scoped to whichever page the user is on. Rails, WebSockets, AI APIs.</li>
+        <li class="no-print"><strong>HookScope</strong>: webhook debugger; capture, inspect, and replay incoming webhooks against a local handler.</li>
+        <li class="no-print"><strong>FlightWise / TaskVault / ShopSense</strong>: earlier full-stack work on flight visualization, task tracking, and e-commerce.</li>
       </ul>
     </section>
   </article>
 </Layout>
+
+<script>
+  const triggerPrintFromHash = () => {
+    if (window.location.hash === '#print') {
+      history.replaceState(null, '', window.location.pathname);
+      window.print();
+    }
+  };
+  triggerPrintFromHash();
+  document.addEventListener('astro:page-load', triggerPrintFromHash);
+</script>
 
 <style>
   .resume {
@@ -177,12 +213,6 @@ const education = [
     margin-bottom: var(--s-6);
   }
   .masthead h1 { font-size: var(--fs-2xl); }
-  .subtitle {
-    color: var(--c-text-muted);
-    font-family: var(--font-mono);
-    font-size: var(--fs-sm);
-    margin-top: var(--s-2);
-  }
   .contact {
     list-style: none;
     padding: 0;
@@ -201,9 +231,13 @@ const education = [
     color: var(--c-text-muted);
     font-size: var(--fs-sm);
   }
+  .download-link {
+    font-weight: 600;
+    color: var(--c-accent);
+  }
 
   section { margin-bottom: var(--s-7); }
-  section > h2 {
+  section h2 {
     font-size: var(--fs-md);
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -274,12 +308,30 @@ const education = [
 
   /* Print refinements specific to this page */
   @media print {
-    .resume { padding: 0; max-width: none; }
-    section { margin-bottom: 1rem; page-break-inside: avoid; }
-    .role { page-break-inside: avoid; margin-bottom: 0.8rem; }
-    section > h2 {
+    .resume { padding: 0; max-width: none; font-size: 9pt; line-height: 1.3; }
+    section { margin-bottom: 0.5rem; }
+    section h2 {
+      font-size: 10pt;
+      margin-bottom: 0.3rem;
+      padding-bottom: 0.1rem;
       border-bottom: 1px solid #999;
       color: #000;
     }
+    .masthead { padding-bottom: 0.35rem; margin-bottom: 0.45rem; }
+    .masthead h1 { font-size: 17pt; }
+    .contact { font-size: 8pt; line-height: 1.25; }
+    .role { page-break-inside: avoid; break-inside: avoid; margin-bottom: 0.4rem; }
+    .role-head h3 { font-size: 10pt; }
+    .role-summary { margin-top: 0.1rem; }
+    .role ul { margin-top: 0.1rem; padding-left: 1rem; }
+    .role ul li { margin-bottom: 0.05rem; }
+    .stack-line { margin-top: 0.15rem; font-size: 8pt; }
+    .cols { gap: 1rem; }
+    .cols > div { page-break-inside: avoid; break-inside: avoid; }
+    .skills dt { margin-top: 0.2rem; }
+    .skills dt:first-of-type { margin-top: 0; }
+    .skills dd { font-size: 8.5pt; }
+    .edu h3 { font-size: 10pt; }
+    .edu p { font-size: 8.5pt; margin-top: 0.1rem; }
   }
 </style>

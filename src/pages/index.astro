@@ -11,7 +11,7 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
 
 <Layout
   title=""
-  description="Will Yennie, full-stack engineer based in NYC. Ruby on Rails, TypeScript, Postgres."
+  description="Will Yennie, full-stack engineer who builds new things and fixes old things. Based in NYC."
 >
   <section class="hero container">
     {SITE.available && (
@@ -21,9 +21,7 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
     <h1 class="name">Will Yennie</h1>
 
     <p class="lede prose">
-      Full-stack engineer in {SITE.location}. I build durable web systems with
-      Ruby on Rails, TypeScript, and Postgres. I care most about the parts users
-      never see: clean data models, sharp boundaries, fast feedback loops.
+      Full-stack engineer who builds new things and fixes old things.
     </p>
 
     <div class="cta">
@@ -40,7 +38,7 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
     <dl class="fit-list">
       <div class="fit-row">
         <dt>role</dt>
-        <dd>senior full-stack on a small team (Rails, TypeScript, or both)</dd>
+        <dd>full-stack, polyglot</dd>
       </div>
       <div class="fit-row">
         <dt>where</dt>
@@ -48,7 +46,7 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
       </div>
       <div class="fit-row">
         <dt>work</dt>
-        <dd>product surface where the data model is the hard part (payments, scheduling, anything correctness-sensitive)</dd>
+        <dd>hard problems that reward going deep (debugging, observability, performance)</dd>
       </div>
       <div class="fit-row">
         <dt>start</dt>
@@ -77,9 +75,14 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
     </p>
     <p>
       The capstone shipped as <a href="/projects/firefly">Firefly</a>, a
-      four-person open-source observability framework for AWS Lambda. Most of
-      my professional work since then has been at
+      four-person open-source observability framework for AWS Lambda. I
+      spent my favorite weeks on the cross-Lambda trace propagation puzzle.
+      Most of my professional work since then has been at
       <a href="/work#insight">Insight Designs</a>, a Boulder web agency.
+    </p>
+    <p>
+      Off the clock: photography, and fixing old game cartridges that have
+      no business still working.
     </p>
     <p>
       Currently looking. <a href={`mailto:${SITE.email}`}>Get in touch</a>.
