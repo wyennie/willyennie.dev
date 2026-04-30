@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0d0e"/>
+      <stop offset="1" stop-color="#131618"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#e6e9ea">
+    <rect x="80" y="80" width="120" height="60" rx="10" fill="#5eead4"/>
+    <text x="140" y="124" text-anchor="middle" font-size="36" font-weight="700" fill="#052725">wy</text>
+    <text x="80" y="320" font-size="84" font-weight="700">Will Yennie</text>
+    <text x="80" y="390" font-size="36" fill="#9aa3a7">full-stack engineer · ruby on rails · typescript · postgres</text>
+    <text x="80" y="560" font-size="28" fill="#5eead4">willyennie.dev</text>
+  </g>
+</svg>

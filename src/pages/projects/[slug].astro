@@ -1,0 +1,133 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Layout from '~/layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', (p) => !p.data.draft);
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+interface Props { project: CollectionEntry<'projects'>; }
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { data } = project;
+---
+
+<Layout title={data.title} description={data.tagline}>
+  <article class="container project">
+    <a class="back" href="/projects">← all projects</a>
+
+    <header class="head">
+      <p class="kicker">
+        <span>{data.year}</span>
+        {data.role && <><span class="sep">·</span><span>{data.role}</span></>}
+      </p>
+      <h1>{data.title}</h1>
+      <p class="tagline">{data.tagline}</p>
+
+      <div class="meta">
+        {data.stack.length > 0 && (
+          <ul class="stack" aria-label="Stack">
+            {data.stack.map((s) => <li>{s}</li>)}
+          </ul>
+        )}
+        <ul class="links">
+          {data.repo && <li><a href={data.repo} target="_blank" rel="noopener">repo →</a></li>}
+          {data.live && <li><a href={data.live} target="_blank" rel="noopener">live →</a></li>}
+        </ul>
+      </div>
+    </header>
+
+    <div class="prose body">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .project { padding-block: var(--s-6) var(--s-8); max-width: 50rem; }
+  .back {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-text-muted);
+    margin-bottom: var(--s-5);
+  }
+  .head {
+    border-bottom: 1px solid var(--c-border);
+    padding-bottom: var(--s-5);
+    margin-bottom: var(--s-6);
+  }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--s-3);
+  }
+  .sep { margin: 0 var(--s-2); color: var(--c-text-dim); }
+  .head h1 { font-size: clamp(2rem, 5vw, 2.75rem); }
+  .tagline {
+    margin-top: var(--s-3);
+    color: var(--c-text-muted);
+    font-size: var(--fs-md);
+  }
+  .meta {
+    margin-top: var(--s-4);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-4);
+    align-items: center;
+  }
+  .stack {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+  .stack li {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-dim);
+    border: 1px solid var(--c-border);
+    padding: 0.15em 0.55em;
+    border-radius: var(--r-sm);
+  }
+  .links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+  }
+
+  .body :global(h2) {
+    font-size: var(--fs-xl);
+    margin-top: var(--s-6);
+    margin-bottom: var(--s-3);
+  }
+  .body :global(h3) {
+    font-size: var(--fs-lg);
+    margin-top: var(--s-5);
+    margin-bottom: var(--s-3);
+  }
+  .body :global(p) { margin-bottom: var(--s-4); }
+  .body :global(ul), .body :global(ol) { margin-bottom: var(--s-4); }
+  .body :global(li) { margin-bottom: var(--s-1); }
+  .body :global(blockquote) {
+    border-left: 2px solid var(--c-accent);
+    padding-left: var(--s-4);
+    margin: var(--s-5) 0;
+    color: var(--c-text-muted);
+    font-style: italic;
+  }
+</style>

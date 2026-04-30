@@ -1,0 +1,82 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '~/layouts/Layout.astro';
+
+const posts = (await getCollection('posts', (p) => !p.data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const fmt = (d: Date) =>
+  new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: 'numeric' }).format(d);
+---
+
+<Layout title="writing" description="Essays and notes by Will Yennie.">
+  <div class="container page prose">
+    <header class="head">
+      <h1>writing</h1>
+      <p class="meta">
+        <a href="/rss.xml">rss</a>
+      </p>
+    </header>
+
+    {posts.length === 0 ? (
+      <div class="empty">
+        <p>Nothing here yet. The first post is in draft.</p>
+        <p class="hint">
+          Subscribe to the <a href="/rss.xml">RSS feed</a> if you want a ping
+          when something lands.
+        </p>
+      </div>
+    ) : (
+      <ul class="post-list">
+        {posts.map((post) => (
+          <li>
+            <a href={`/writing/${post.id}`}>
+              <span class="date">{fmt(post.data.pubDate)}</span>
+              <span class="title">{post.data.title}</span>
+            </a>
+            <p class="desc">{post.data.description}</p>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</Layout>
+
+<style>
+  .page { padding-block: var(--s-7) var(--s-8); }
+  .head { margin-bottom: var(--s-6); }
+  .head h1 { font-size: var(--fs-2xl); }
+  .meta { font-family: var(--font-mono); font-size: var(--fs-sm); margin-top: var(--s-2); }
+
+  .empty {
+    border: 1px dashed var(--c-border-strong);
+    border-radius: var(--r-md);
+    padding: var(--s-5);
+    color: var(--c-text-muted);
+  }
+  .hint { margin-top: var(--s-2); font-size: var(--fs-sm); }
+
+  .post-list { list-style: none; padding: 0; margin: 0; }
+  .post-list li { padding: var(--s-4) 0; border-bottom: 1px solid var(--c-border); }
+  .post-list a {
+    display: flex;
+    gap: var(--s-4);
+    align-items: baseline;
+    color: var(--c-text);
+    text-decoration: none;
+  }
+  .post-list a:hover .title { color: var(--c-accent); }
+  .date {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-dim);
+    min-width: 6.5rem;
+  }
+  .title { font-family: var(--font-mono); font-size: var(--fs-md); }
+  .desc { color: var(--c-text-muted); margin-top: var(--s-2); margin-left: 7.5rem; }
+
+  @media (max-width: 540px) {
+    .post-list a { flex-direction: column; gap: var(--s-1); }
+    .desc { margin-left: 0; }
+  }
+</style>

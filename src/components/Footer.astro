@@ -1,0 +1,67 @@
+---
+import { SITE } from '~/lib/site';
+
+const buildSha = (import.meta.env.PUBLIC_BUILD_SHA ?? '').slice(0, 7);
+const buildTime = import.meta.env.PUBLIC_BUILD_TIME ?? '';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer no-print">
+  <div class="container row">
+    <div class="col">
+      <p class="line">
+        <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      </p>
+      <p class="line muted">{SITE.location} · &copy; {year}</p>
+    </div>
+
+    <div class="col">
+      <ul class="links">
+        <li><a href={SITE.github} rel="noopener" target="_blank">github</a></li>
+        <li><a href={SITE.linkedin} rel="noopener" target="_blank">linkedin</a></li>
+        <li><a href="/rss.xml">rss</a></li>
+      </ul>
+      {buildSha && (
+        <p class="build">
+          built {buildTime}
+          {buildSha && (<>
+            {' · '}<code>{buildSha}</code>
+          </>)}
+        </p>
+      )}
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--s-9);
+    border-top: 1px solid var(--c-border);
+    padding-block: var(--s-6);
+    font-size: var(--fs-sm);
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-5);
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .col { display: flex; flex-direction: column; gap: var(--s-2); }
+  .line { font-family: var(--font-mono); }
+  .line.muted { color: var(--c-text-muted); }
+  .links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: var(--s-4);
+    font-family: var(--font-mono);
+  }
+  .build {
+    color: var(--c-text-dim);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    margin-top: var(--s-1);
+  }
+</style>

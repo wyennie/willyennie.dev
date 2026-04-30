@@ -1,0 +1,83 @@
+---
+import Layout from '~/layouts/Layout.astro';
+---
+
+<Layout title="404" description="Page not found." noindex>
+  <div class="container wrap">
+    <p class="status">404 · not found</p>
+
+    <pre class="term"><span class="prompt">$</span> cd <span class="path js-bad-path">/</span>
+cd: no such file or directory: <span class="path js-bad-path">/</span>
+<span class="prompt">$</span> echo "..."
+the page either never existed, or didn't survive the rebuild.
+<span class="prompt">$</span> ls /</pre>
+
+    <ul class="links">
+      <li><a href="/">→ index</a></li>
+      <li><a href="/projects">→ projects</a></li>
+      <li><a href="/work">→ work / résumé</a></li>
+      <li><a href="/writing">→ writing</a></li>
+      <li><a href="/now">→ now</a></li>
+      <li><a href="/uses">→ uses</a></li>
+    </ul>
+
+    <p class="hint">
+      Or hit <kbd>⌘</kbd>+<kbd>K</kbd> to search.
+    </p>
+  </div>
+</Layout>
+
+<script>
+  const fill = () => {
+    const p = window.location.pathname;
+    document.querySelectorAll<HTMLElement>('.js-bad-path').forEach((el) => {
+      el.textContent = p;
+    });
+  };
+  fill();
+  document.addEventListener('astro:page-load', fill);
+</script>
+
+<style>
+  .wrap {
+    padding-block: var(--s-8);
+    max-width: 38rem;
+  }
+  .status {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-accent);
+    letter-spacing: 0.1em;
+  }
+  .term {
+    margin-top: var(--s-4);
+    background: var(--c-bg-sunken);
+    border: 1px solid var(--c-border);
+    padding: var(--s-4);
+    border-radius: var(--r-md);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-text);
+    line-height: var(--lh-snug);
+    overflow-x: auto;
+  }
+  .term .prompt { color: var(--c-accent); }
+  .term .path { color: var(--c-text); }
+
+  .links {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-md);
+  }
+  .hint {
+    margin-top: var(--s-5);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-text-muted);
+  }
+</style>

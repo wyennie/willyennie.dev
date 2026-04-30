@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '~/layouts/Layout.astro';
+import ProjectCard from '~/components/ProjectCard.astro';
+
+const all = (await getCollection('projects', (p) => !p.data.draft))
+  .sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+
+const featured = all.filter((p) => p.data.featured);
+const earlier = all.filter((p) => !p.data.featured);
+---
+
+<Layout title="projects" description="Selected projects: case studies and earlier work.">
+  <div class="container page">
+    <header class="page-head">
+      <h1>projects</h1>
+      <p class="lede prose">
+        A short, opinionated cut. Two recent case studies up top; older work in
+        the grid below for the curious.
+      </p>
+    </header>
+
+    <section>
+      <h2 class="section-h"><span class="hash">#</span> featured</h2>
+      <div class="grid grid-2">
+        {featured.map((p) => <ProjectCard project={p} variant="featured" />)}
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-h"><span class="hash">#</span> earlier work</h2>
+      <div class="grid grid-3">
+        {earlier.map((p) => <ProjectCard project={p} variant="compact" />)}
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .page { padding-block: var(--s-7) var(--s-8); }
+  .page-head { margin-bottom: var(--s-7); }
+  .page-head h1 { font-size: var(--fs-2xl); }
+  .lede { margin-top: var(--s-3); color: var(--c-text-muted); }
+
+  .section-h {
+    font-size: var(--fs-md);
+    color: var(--c-text-muted);
+    font-weight: 500;
+    margin-bottom: var(--s-4);
+  }
+  .hash { color: var(--c-accent); }
+
+  section { margin-bottom: var(--s-7); }
+
+  .grid { display: grid; gap: var(--s-4); }
+  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+</style>

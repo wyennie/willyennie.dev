@@ -1,0 +1,209 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '~/layouts/Layout.astro';
+import Pill from '~/components/Pill.astro';
+import ProjectCard from '~/components/ProjectCard.astro';
+import { SITE } from '~/lib/site';
+
+const featured = (await getCollection('projects', (p) => !p.data.draft && p.data.featured))
+  .sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+---
+
+<Layout
+  title=""
+  description="Will Yennie, full-stack engineer who builds new things and fixes old things. Based in NYC."
+>
+  <section class="hero container">
+    {SITE.available && (
+      <Pill tone="accent" dot>available for hire</Pill>
+    )}
+
+    <h1 class="name">Will Yennie</h1>
+
+    <p class="lede prose">
+      Full-stack engineer who builds new things and fixes old things.
+    </p>
+
+    <div class="cta">
+      <a href={`mailto:${SITE.email}`} class="btn primary">
+        say hello
+        <span class="email">{SITE.email}</span>
+      </a>
+      <a href="/work" class="btn ghost">see work →</a>
+    </div>
+  </section>
+
+  <section class="fit container">
+    <h2><span class="hash">#</span> a fit if you're hiring for</h2>
+    <dl class="fit-list">
+      <div class="fit-row">
+        <dt>role</dt>
+        <dd>full-stack, polyglot</dd>
+      </div>
+      <div class="fit-row">
+        <dt>where</dt>
+        <dd>{SITE.location}. Remote or hybrid; comfortable across US/EU hours</dd>
+      </div>
+      <div class="fit-row">
+        <dt>work</dt>
+        <dd>hard problems that reward going deep (debugging, observability, performance)</dd>
+      </div>
+      <div class="fit-row">
+        <dt>start</dt>
+        <dd>available now</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="featured container">
+    <header class="section-head">
+      <h2><span class="hash">#</span> featured work</h2>
+      <a href="/projects" class="see-all">all projects →</a>
+    </header>
+
+    <div class="grid">
+      {featured.map((p) => <ProjectCard project={p} variant="featured" />)}
+    </div>
+  </section>
+
+  <section class="bio container prose">
+    <h2><span class="hash">#</span> the short version</h2>
+    <p>
+      I came to engineering through Launch School's multi-year, mastery-based
+      program. Fundamentals first (data structures, networking, REST,
+      databases), then a capstone in system design and distributed systems.
+    </p>
+    <p>
+      The capstone shipped as <a href="/projects/firefly">Firefly</a>, a
+      four-person open-source observability framework for AWS Lambda. I
+      spent my favorite weeks on the cross-Lambda trace propagation puzzle.
+      Most of my professional work since then has been at
+      <a href="/work#insight">Insight Designs</a>, a Boulder web agency.
+    </p>
+    <p>
+      Off the clock: photography, and fixing old game cartridges that have
+      no business still working.
+    </p>
+    <p>
+      Currently looking. <a href={`mailto:${SITE.email}`}>Get in touch</a>.
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    padding-block: var(--s-8) var(--s-7);
+  }
+  .name {
+    margin-top: var(--s-4);
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    letter-spacing: -0.02em;
+  }
+  .lede {
+    margin-top: var(--s-5);
+    font-size: var(--fs-md);
+    color: var(--c-text);
+  }
+  .cta {
+    margin-top: var(--s-6);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: center;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    padding: var(--s-3) var(--s-4);
+    border-radius: var(--r-md);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .btn.primary {
+    background: var(--c-accent);
+    color: var(--c-accent-on);
+  }
+  .btn.primary:hover {
+    background: var(--c-accent-hover);
+    color: var(--c-accent-on);
+    text-decoration: none;
+  }
+  .btn.ghost {
+    color: var(--c-text);
+    border-color: var(--c-border-strong);
+  }
+  .btn.ghost:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+    text-decoration: none;
+  }
+  .email {
+    color: color-mix(in srgb, var(--c-accent-on) 70%, transparent);
+    font-weight: 600;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-5);
+  }
+  .section-head h2 {
+    font-size: var(--fs-lg);
+    color: var(--c-text-muted);
+    font-weight: 500;
+  }
+  .hash { color: var(--c-accent); }
+  .see-all {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+  }
+
+  .fit { padding-block: var(--s-5) var(--s-6); }
+  .fit h2 {
+    font-size: var(--fs-lg);
+    color: var(--c-text-muted);
+    font-weight: 500;
+    margin-bottom: var(--s-4);
+  }
+  .fit-list {
+    display: grid;
+    gap: var(--s-2);
+    margin: 0;
+    border-left: 1px solid var(--c-border);
+    padding-left: var(--s-4);
+  }
+  .fit-row {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+  }
+  .fit-row dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--c-accent);
+  }
+  .fit-row dd { margin: 0; color: var(--c-text); }
+  @media (max-width: 540px) {
+    .fit-row { grid-template-columns: 1fr; gap: var(--s-1); }
+  }
+
+  .featured { padding-block: var(--s-6); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--s-4);
+  }
+
+  .bio { padding-block: var(--s-7); }
+  .bio h2 { font-size: var(--fs-lg); color: var(--c-text-muted); font-weight: 500; margin-bottom: var(--s-4); }
+  .bio p + p { margin-top: var(--s-4); }
+</style>

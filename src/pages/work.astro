@@ -1,0 +1,337 @@
+---
+import Layout from '~/layouts/Layout.astro';
+import { SITE } from '~/lib/site';
+
+/* TODO(Will): walk this list and prune anything you wouldn't want to be
+   asked about in a technical interview. The current list is what shows up
+   across willyennie.com + your projects + likely Insight Designs work; some
+   of it (Sidekiq, Redis, GraphQL, Stimulus, Astro, Vite) is plausible but
+   not directly evidenced in the public sources. Cut what isn't real. */
+const skills = {
+  Languages: ['JavaScript', 'TypeScript', 'Ruby', 'PHP', 'Python', 'Go', 'SQL', 'Bash'],
+  'Backend & data': ['Node.js / Express', 'Rails', 'Sinatra', 'PostgreSQL', 'MongoDB', 'REST'],
+  Frontend: ['React', 'Handlebars', 'ERB', 'CSS', 'Astro'],
+  Infra: ['Docker', 'Terraform', 'AWS (Lambda, Kinesis Firehose, CloudWatch)', 'DigitalOcean', 'nginx'],
+  Observability: ['OpenTelemetry', 'Grafana', 'Prometheus', 'Promscale / TimescaleDB'],
+  Practice: ['TDD', 'systems design', 'mastery-based learning'],
+};
+
+type Role = {
+  company: string;
+  title: string;
+  location: string;
+  start: Date;
+  end: Date | 'present';
+  displayDate?: string;
+  summary: string;
+  bullets: string[];
+  stack: string[];
+  anchor: string;
+};
+
+const fmtDate = (d: Date | 'present') =>
+  d === 'present'
+    ? 'present'
+    : d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+const fmtRange = (r: Role) =>
+  r.displayDate ?? `${fmtDate(r.start)} – ${fmtDate(r.end)}`;
+
+const roles: Role[] = [
+  {
+    company: 'Insight Designs Web Solutions',
+    title: 'Software Engineer',
+    location: 'Boulder, CO (remote)',
+    start: new Date(2025, 1),
+    end: new Date(2026, 3),
+    summary:
+      'Full-stack and infrastructure work for a Boulder-based web design consultancy with 600+ clients across its portfolio.',
+    bullets: [
+      'Initiated company plugin development with a Google Reviews integration (Google Places API), letting clients embed Google Business reviews on their sites.',
+      'Built a Python tool to automate vulnerability monitoring across 100+ WordPress installations, aggregating security plugin data to flag outdated or compromised plugins.',
+      'Hardened DigitalOcean infrastructure for 40+ client websites: security updates (Apache, MySQL), SSL provisioning, and monitoring.',
+    ],
+    stack: ['Shopify / Liquid', 'WordPress / PHP', 'JavaScript', 'HTML / CSS', 'DigitalOcean'],
+    anchor: 'insight',
+  },
+  {
+    company: 'ZenML',
+    title: 'Open-source contributor',
+    location: 'Remote',
+    start: new Date(2024, 5),
+    end: new Date(2024, 9),
+    summary: 'Built a chatbot feature for the official ZenML VSCode extension.',
+    bullets: [
+      'Integrated OpenAI and Anthropic Claude APIs for context-aware chat scoped to the user\'s selected ML pipeline.',
+      'Built the chat UI: dropdowns, interactive controls, per-conversation context selection, and state management.',
+      'Implemented token-by-token message streaming so responses arrive live instead of as a single blocking call.',
+    ],
+    stack: ['TypeScript', 'VSCode Extension API', 'OpenAI API', 'Anthropic Claude API'],
+    anchor: 'zenml',
+  },
+  {
+    company: 'Firefly',
+    title: 'Software Engineer, co-creator',
+    location: 'Remote, 4-person team',
+    start: new Date(2022, 9),
+    end: new Date(2023, 1),
+    summary:
+      'Open-source observability framework for AWS Lambda. Serverless function health via metrics and traces.',
+    bullets: [
+      'Implemented W3C TraceContext propagation across asynchronous Lambda invocations, fixing trace accuracy for cross-function event flows.',
+      'Built a custom OpenTelemetry collector handling up to 500,000 metrics and trace data points per day.',
+      'Architected a telemetry pipeline using OpenTelemetry and Promscale; 30% faster data retrieval for performance queries.',
+      'Built a CLI tool to automate Lambda instrumentation and AWS infrastructure setup, cutting setup time by up to 40 hours.',
+    ],
+    stack: ['Node.js', 'OpenTelemetry', 'AWS Lambda', 'Terraform', 'Docker', 'Promscale / TimescaleDB', 'Grafana'],
+    anchor: 'firefly',
+  },
+];
+
+const education = [
+  {
+    name: 'Launch School',
+    detail: 'Full Stack Web Development. Multi-year mastery-based program. Core: OOP, data structures, networking, REST, databases. Capstone: advanced algorithms, system design.',
+    years: '2021 – 2023',
+  },
+];
+---
+
+<Layout title="work" description="Will Yennie résumé, roles, and stack." bodyClass="work-page">
+  <article class="container resume">
+    <header class="masthead">
+      <div>
+        <h1>Will Yennie</h1>
+      </div>
+      <ul class="contact">
+        <li><a href={SITE.url}>{SITE.domain}</a></li>
+        <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+        <li>{SITE.location}</li>
+        <li><a href={SITE.linkedin}>linkedin.com/in/will-yennie</a></li>
+        <li><a href={SITE.github}>{SITE.github.replace('https://', '')}</a></li>
+      </ul>
+    </header>
+
+    <div id="print" class="print-hint no-print">
+      <p>
+        <a href="/Will_Yennie_Resume.pdf" class="download-link" download>Download PDF</a>
+        or press <kbd>⌘</kbd> / <kbd>Ctrl</kbd> + <kbd>P</kbd> to print this page.
+      </p>
+    </div>
+
+    <section>
+      <h2>Summary</h2>
+      <p>
+        Full-stack engineer who builds new things and fixes old things. I
+        like puzzles, hard bugs, and going deep. Comfortable across
+        JavaScript, TypeScript, Ruby, PHP, Python, Go, and SQL/NoSQL.
+      </p>
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+      {roles.map((r) => (
+        <article class="role" id={r.anchor}>
+          <header class="role-head">
+            <h3>{r.title} · <span class="company">{r.company}</span></h3>
+            <span class="when">{fmtRange(r)} · {r.location}</span>
+          </header>
+          <p class="role-summary">{r.summary}</p>
+          <ul>
+            {r.bullets.map((b) => <li>{b}</li>)}
+          </ul>
+          <p class="stack-line">
+            <span class="lbl">stack:</span> {r.stack.join(' · ')}
+          </p>
+        </article>
+      ))}
+    </section>
+
+    <section class="cols">
+      <div>
+        <h2>Skills</h2>
+        <dl class="skills">
+          {Object.entries(skills).map(([k, v]) => (
+            <>
+              <dt>{k}</dt>
+              <dd>{v.join(', ')}</dd>
+            </>
+          ))}
+        </dl>
+      </div>
+
+      <div>
+        <h2>Education</h2>
+        {education.map((e) => (
+          <article class="edu">
+            <h3>{e.name}</h3>
+            <p>{e.detail}</p>
+            <p class="when">{e.years}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+      <p class="muted no-print">
+        Full case studies at <a href="/projects">willyennie.dev/projects</a>.
+      </p>
+      <ul class="proj-line">
+        <li><strong>Tabletop Ledger</strong> <em>(2025)</em>: solo-built campaign organizer for tabletop RPG game masters. Tree of pages with a WYSIWYG editor, plus a context-aware AI chat scoped to whichever page the user is on. Rails, WebSockets, AI APIs.</li>
+        <li class="no-print"><strong>HookScope</strong>: webhook debugger; capture, inspect, and replay incoming webhooks against a local handler.</li>
+        <li class="no-print"><strong>FlightWise / TaskVault / ShopSense</strong>: earlier full-stack work on flight visualization, task tracking, and e-commerce.</li>
+      </ul>
+    </section>
+  </article>
+</Layout>
+
+<script>
+  const triggerPrintFromHash = () => {
+    if (window.location.hash === '#print') {
+      history.replaceState(null, '', window.location.pathname);
+      window.print();
+    }
+  };
+  triggerPrintFromHash();
+  document.addEventListener('astro:page-load', triggerPrintFromHash);
+</script>
+
+<style>
+  .resume {
+    padding-block: var(--s-7) var(--s-8);
+    max-width: 50rem;
+  }
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-5);
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--c-border);
+    padding-bottom: var(--s-5);
+    margin-bottom: var(--s-6);
+  }
+  .masthead h1 { font-size: var(--fs-2xl); }
+  .contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-text-muted);
+    text-align: right;
+    line-height: var(--lh-snug);
+  }
+  .print-hint {
+    border: 1px dashed var(--c-border-strong);
+    border-radius: var(--r-md);
+    padding: var(--s-3) var(--s-4);
+    margin-bottom: var(--s-6);
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+  }
+  .download-link {
+    font-weight: 600;
+    color: var(--c-accent);
+  }
+
+  section { margin-bottom: var(--s-7); }
+  section h2 {
+    font-size: var(--fs-md);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-accent);
+    border-bottom: 1px solid var(--c-border);
+    padding-bottom: var(--s-2);
+    margin-bottom: var(--s-4);
+  }
+
+  .role { margin-bottom: var(--s-6); }
+  .role-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+  .role-head h3 { font-size: var(--fs-md); }
+  .company { color: var(--c-text-muted); font-weight: 400; }
+  .when {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-muted);
+  }
+  .role-summary {
+    margin-top: var(--s-2);
+    color: var(--c-text-muted);
+  }
+  .role ul {
+    margin-top: var(--s-2);
+  }
+  .role ul li { margin-bottom: var(--s-1); }
+  .stack-line {
+    margin-top: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-dim);
+  }
+  .stack-line .lbl { color: var(--c-text-muted); }
+
+  .cols {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--s-6);
+  }
+  @media (max-width: 640px) {
+    .cols { grid-template-columns: 1fr; }
+    .masthead { flex-direction: column; }
+    .contact { text-align: left; }
+  }
+  .skills dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--c-text-muted);
+    margin-top: var(--s-3);
+  }
+  .skills dd { margin-left: 0; }
+  .skills dt:first-of-type { margin-top: 0; }
+
+  .edu h3 { font-size: var(--fs-md); }
+  .edu p { color: var(--c-text-muted); }
+
+  .proj-line { padding-left: 1.25rem; }
+  .proj-line li { margin-bottom: var(--s-2); }
+  .muted { color: var(--c-text-muted); margin-bottom: var(--s-3); }
+
+  /* Print refinements specific to this page */
+  @media print {
+    .resume { padding: 0; max-width: none; font-size: 9pt; line-height: 1.3; }
+    section { margin-bottom: 0.5rem; }
+    section h2 {
+      font-size: 10pt;
+      margin-bottom: 0.3rem;
+      padding-bottom: 0.1rem;
+      border-bottom: 1px solid #999;
+      color: #000;
+    }
+    .masthead { padding-bottom: 0.35rem; margin-bottom: 0.45rem; }
+    .masthead h1 { font-size: 17pt; }
+    .contact { font-size: 8pt; line-height: 1.25; }
+    .role { page-break-inside: avoid; break-inside: avoid; margin-bottom: 0.4rem; }
+    .role-head h3 { font-size: 10pt; }
+    .role-summary { margin-top: 0.1rem; }
+    .role ul { margin-top: 0.1rem; padding-left: 1rem; }
+    .role ul li { margin-bottom: 0.05rem; }
+    .stack-line { margin-top: 0.15rem; font-size: 8pt; }
+    .cols { gap: 1rem; }
+    .cols > div { page-break-inside: avoid; break-inside: avoid; }
+    .skills dt { margin-top: 0.2rem; }
+    .skills dt:first-of-type { margin-top: 0; }
+    .skills dd { font-size: 8.5pt; }
+    .edu h3 { font-size: 10pt; }
+    .edu p { font-size: 8.5pt; margin-top: 0.1rem; }
+  }
+</style>

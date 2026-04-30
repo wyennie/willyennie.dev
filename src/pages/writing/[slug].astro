@@ -1,0 +1,58 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Layout from '~/layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', (p) => !p.data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+interface Props { post: CollectionEntry<'posts'>; }
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const fmt = (d: Date) =>
+  new Intl.DateTimeFormat('en', { year: 'numeric', month: 'long', day: 'numeric' }).format(d);
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <article class="container post">
+    <a class="back" href="/writing">← all writing</a>
+
+    <header class="head">
+      <p class="kicker">
+        <time datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
+        {post.data.updated && (
+          <>
+            <span class="sep">·</span>
+            <span>updated {fmt(post.data.updated)}</span>
+          </>
+        )}
+      </p>
+      <h1>{post.data.title}</h1>
+      <p class="lede">{post.data.description}</p>
+    </header>
+
+    <div class="prose body">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .post { padding-block: var(--s-6) var(--s-8); max-width: 42rem; }
+  .back { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--c-text-muted); margin-bottom: var(--s-5); display: inline-block; }
+  .head { border-bottom: 1px solid var(--c-border); padding-bottom: var(--s-5); margin-bottom: var(--s-6); }
+  .kicker { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: var(--s-3); }
+  .sep { margin: 0 var(--s-2); color: var(--c-text-dim); }
+  .head h1 { font-size: clamp(2rem, 5vw, 2.75rem); }
+  .lede { margin-top: var(--s-3); color: var(--c-text-muted); font-size: var(--fs-md); }
+  .body :global(h2) { font-size: var(--fs-xl); margin-top: var(--s-6); margin-bottom: var(--s-3); }
+  .body :global(h3) { font-size: var(--fs-lg); margin-top: var(--s-5); margin-bottom: var(--s-3); }
+  .body :global(p) { margin-bottom: var(--s-4); }
+  .body :global(ul), .body :global(ol) { margin-bottom: var(--s-4); }
+  .body :global(li) { margin-bottom: var(--s-1); }
+</style>

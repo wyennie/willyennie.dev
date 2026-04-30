@@ -1,0 +1,104 @@
+---
+import '~/styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import Header from '~/components/Header.astro';
+import Footer from '~/components/Footer.astro';
+import CommandPalette from '~/components/CommandPalette.astro';
+import { SITE } from '~/lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  bodyClass?: string;
+}
+
+const {
+  title,
+  description = SITE.description,
+  ogImage = '/og-default.svg',
+  noindex = false,
+  bodyClass = '',
+} = Astro.props;
+
+const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name}, engineer`;
+const canonical = new URL(Astro.url.pathname, SITE.url).toString();
+const og = new URL(ogImage, SITE.url).toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0b0d0e" />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.name} · writing`} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:site_name" content={SITE.name} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={og} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: SITE.name,
+      url: SITE.url,
+      jobTitle: 'Full-stack engineer',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'New York',
+        addressRegion: 'NY',
+        addressCountry: 'US',
+      },
+      email: `mailto:${SITE.email}`,
+      sameAs: [SITE.github, SITE.linkedin],
+      knowsAbout: ['Ruby on Rails', 'TypeScript', 'PostgreSQL', 'React', 'Astro'],
+    })} />
+
+    <ClientRouter />
+  </head>
+  <body class={bodyClass}>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <CommandPalette />
+  </body>
+</html>
+
+<style is:global>
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: var(--s-2);
+    background: var(--c-accent);
+    color: var(--c-accent-on);
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    z-index: 100;
+  }
+  .skip-link:focus { left: var(--s-3); }
+  main { display: block; }
+</style>

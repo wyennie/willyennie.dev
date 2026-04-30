@@ -1,0 +1,136 @@
+---
+import { SITE, NAV } from '~/lib/site';
+
+const { pathname } = Astro.url;
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+
+<header class="site-header no-print">
+  <div class="container row">
+    <a href="/" class="brand" aria-label={`${SITE.name}, home`}>
+      <span class="brand-mark">wy</span>
+      <span class="brand-name">{SITE.name}</span>
+    </a>
+
+    <nav aria-label="Primary">
+      <ul>
+        {NAV.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={['nav-link', { active: isActive(item.href) }]}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+        <li class="cmd-li">
+          <button
+            type="button"
+            class="cmd-hint"
+            data-cmdk-open
+            aria-label="Open command palette"
+          >
+            <kbd class="mac">⌘</kbd><kbd class="win">Ctrl</kbd><kbd>K</kbd>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--c-bg) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(8px);
+    border-bottom: 1px solid var(--c-border);
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-5);
+    padding-block: var(--s-3);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    color: var(--c-text);
+    font-family: var(--font-mono);
+    text-decoration: none;
+  }
+  .brand:hover { color: var(--c-text); text-decoration: none; }
+  .brand-mark {
+    display: inline-block;
+    background: var(--c-accent);
+    color: var(--c-accent-on);
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: var(--r-sm);
+    letter-spacing: 0.02em;
+  }
+  .brand-name {
+    font-size: var(--fs-sm);
+    color: var(--c-text-muted);
+  }
+  nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: var(--s-4);
+    align-items: center;
+  }
+  .nav-link {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-text-muted);
+    padding: var(--s-1) var(--s-2);
+    border-radius: var(--r-sm);
+  }
+  .nav-link::before { content: '/'; color: var(--c-text-dim); margin-right: 1px; }
+  .nav-link:hover { color: var(--c-text); text-decoration: none; }
+  .nav-link.active { color: var(--c-accent); }
+
+  .cmd-li { display: inline-flex; }
+  .cmd-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: var(--s-1) var(--s-2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+    background: var(--c-bg-raised);
+    color: var(--c-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .cmd-hint:hover {
+    color: var(--c-text);
+    border-color: var(--c-accent-dim);
+  }
+  .cmd-hint kbd {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+  :global(html[data-platform="mac"]) .cmd-hint .win { display: none; }
+  :global(html[data-platform="win"]) .cmd-hint .mac { display: none; }
+  :global(html:not([data-platform])) .cmd-hint .win { display: none; }
+
+  @media (max-width: 540px) {
+    .brand-name { display: none; }
+    nav ul { gap: var(--s-2); }
+    .nav-link { padding: var(--s-1); }
+    .cmd-li { display: none; }
+  }
+</style>

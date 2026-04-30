@@ -15,8 +15,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Add a build step here later if you switch to Astro/Hugo/etc.
-      # For now, public/ is what we ship.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+        env:
+          PUBLIC_BUILD_SHA: ${{ github.sha }}
+          PUBLIC_BUILD_TIME: ${{ github.event.head_commit.timestamp }}
 
       - name: Set up SSH
         run: |
@@ -29,5 +41,5 @@ jobs:
         run: |
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/id_ed25519" \
-            public/ \
+            dist/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:./

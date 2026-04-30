@@ -1,0 +1,94 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  variant?: 'featured' | 'compact';
+}
+
+const { project, variant = 'compact' } = Astro.props;
+const { data, id } = project;
+const href = `/projects/${id}`;
+---
+
+<a href={href} class:list={['card', variant]}>
+  <div class="head">
+    <h3 class="title">{data.title}</h3>
+    <span class="year">{data.year}</span>
+  </div>
+  <p class="tagline">{data.tagline}</p>
+  {data.stack.length > 0 && (
+    <ul class="stack" aria-label="Stack">
+      {data.stack.slice(0, 5).map((s) => <li>{s}</li>)}
+    </ul>
+  )}
+  <span class="more" aria-hidden="true">read →</span>
+</a>
+
+<style>
+  .card {
+    display: block;
+    color: var(--c-text);
+    text-decoration: none;
+    background: var(--c-bg-raised);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: var(--s-5);
+    transition:
+      border-color var(--dur-normal) var(--ease-out),
+      transform var(--dur-normal) var(--ease-out),
+      background-color var(--dur-normal) var(--ease-out);
+  }
+  .card:hover {
+    border-color: var(--c-accent-dim);
+    text-decoration: none;
+    transform: translateY(-1px);
+    background: color-mix(in srgb, var(--c-bg-raised) 80%, var(--c-accent) 4%);
+  }
+  .card.featured {
+    padding: var(--s-6);
+  }
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-2);
+  }
+  .title {
+    font-family: var(--font-mono);
+    font-size: var(--fs-lg);
+    color: var(--c-text);
+  }
+  .featured .title { font-size: var(--fs-xl); }
+  .year {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-dim);
+  }
+  .tagline {
+    color: var(--c-text-muted);
+    margin-bottom: var(--s-3);
+  }
+  .stack {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--s-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+  .stack li {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-dim);
+    border: 1px solid var(--c-border);
+    padding: 0.15em 0.55em;
+    border-radius: var(--r-sm);
+  }
+  .more {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--c-accent);
+  }
+</style>
