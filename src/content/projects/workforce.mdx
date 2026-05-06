@@ -1,0 +1,60 @@
+---
+title: "Workforce"
+tagline: "A CLI that gives you a persistent roster of Claude specialists, assignable across projects, dispatchable on tickets, and runnable in parallel via git worktrees."
+role: "Creator; software engineer"
+year: 2026
+stack: ["Python", "Typer", "claude-agent-sdk", "Pydantic", "asyncio", "Git worktrees"]
+featured: true
+order: 2
+repo: "https://github.com/wyennie/workforce"
+summary: "A staffing-agency CLI for AI engineers: hire named specialists, assign them to projects, file tickets, and let a Manager fan work out across parallel git-worktree subprocesses."
+---
+
+## What it is
+
+Workforce is a staffing agency for AI engineers, not a session manager. You
+hire named specialists (`aria` the backend specialist, `ben` the frontend
+specialist, …), assign them to projects, and file tickets. Workforce picks
+the right specialist, isolates the work in a git worktree, runs a
+`claude-agent-sdk` subprocess to completion, and writes back what was
+learned so the next mission starts smarter.
+
+## What I built
+
+- **Manager / specialist split.** A built-in Manager role reads the project,
+  classifies the ticket as `parallel | sequential | single`, and proposes a
+  decomposition. Independent sub-tasks are scheduled concurrently via a
+  Kahn's-algorithm topological sort; dependent ones run in order. Each
+  sub-task gets its own worktree, branch, and subprocess.
+- **Worktree isolation per mission.** Every dispatch forks a `workforce/<mission-id>`
+  branch into `~/.workforce/projects/<id>/worktrees/<mission-id>/`. The
+  user's main checkout is never dirtied, parallel missions never collide,
+  and nothing lands on `main` until the user promotes it (or opts in with
+  `--auto-merge` / a staging `--branch dev`).
+- **Persistent, two-tier memory.** Each specialist has an append-only
+  cross-project `memory.md` (lessons that travel with them) and a
+  per-project memory file (lessons specific to one repo). Future missions
+  start warmer than the last.
+- **Reviewer loop.** With `--review`, a read-only Reviewer specialist
+  inspects each diff after the work is done; on rejection, the original
+  specialist re-runs with the Reviewer's feedback, capped at
+  `--max-revisions` rounds.
+- **Auto-staffing from templates.** When the Manager decomposes a ticket and
+  needs a role you haven't hired (e.g. it wants a `tester` for a backend
+  ticket), Workforce hires from a template and assigns to the project on
+  the fly.
+- **Honest git attribution.** Specialists commit their own work in
+  conventional-commits style as the user (Workforce never overrides
+  `user.name` / `user.email`); a `Co-Authored-By: <name> <name>@workforce.local`
+  trailer credits which specialist did the work.
+
+## Why it exists
+
+Most "agent runner" tools treat each invocation as a fresh session: same
+prompt template, no memory of what worked last time, and one repo at a time.
+That's fine for one-shot tasks, but it scales badly when you actually want
+several specialists working a backlog across several projects. Workforce
+treats specialists as *durable*, projects as *first-class*, and missions as
+*isolated*, so you can fan out without losing track of who learned what.
+
+*Built 2026.*
