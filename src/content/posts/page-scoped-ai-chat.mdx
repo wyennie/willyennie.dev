@@ -1,0 +1,77 @@
+---
+title: "Page-scoped AI chat in a Rails tree-of-pages app"
+description: "How Tabletop Ledger feeds the LLM 'what page am I on' with a gsub chain and a single delete-and-insert per page navigation."
+pubDate: 2025-06-02
+draft: false
+tags: ["rails", "llm", "actioncable", "tabletop-ledger"]
+---
+
+[Tabletop Ledger](https://github.com/wyennie/ttledger) is a campaign organizer for tabletop RPG game masters. A campaign is a tree of pages: a faction has cities, a city has NPCs, an NPC has a backstory and a session log. Sitting alongside the page tree is a chat panel, and that chat panel is scoped to whichever page you're currently on. Ask "what's this NPC's motivation?" while looking at an NPC page, and the answer pulls from that page rather than the whole campaign.
+
+"Scoped to the current page" sounds magical. The mechanics are not.
+
+## The pattern: rebuild the system prompt on every page nav
+
+Each campaign has exactly one Chat record. The user's question and the assistant's reply are stored as Message rows on that Chat. Conceptually, the chat is the campaign-wide conversation, but the *system message* on it is rewritten every time the user opens a different page.
+
+In `PagesController#show`:
+
+```ruby
+def show
+  @chat = Chat.find_by(campaign_id: params[:campaign_id])
+  @chat.messages.where(message_role: :system).delete_all
+  @chat.messages.create!(
+    message_role: :system,
+    content: add_page_context
+  )
+end
+```
+
+That's the trick. Three lines, two queries (one delete plus one insert), and now the conversation history is stitched to a fresh system message that contains only this page. The user types their question, the controller appends a `user`-role message, and the existing history (user and assistant turns from previous pages) carries over.
+
+Side effect: the same chat history follows you across pages. Ask a question on the NPC page, navigate to the city, ask a follow-up. The model still sees the prior turns. The grounding shifts; the conversation doesn't reset.
+
+## Building the context
+
+`add_page_context` is the prompt template:
+
+```ruby
+def add_page_context
+  body = @page.body
+    .gsub(/<\/ul>/, "")
+    .gsub(/<ul>/, "\n")
+    .gsub(/<\/li>/, "")
+    .gsub(/<li>/, "\n- ")
+    .gsub(/<\/?p>|<br\s*\/?>/, "\n")
+    .gsub(/\n+/, "\n")
+
+  "Your job is to assist the Game-Master in developing their tabletop roleplaying campaign.
+  Given the following information:\n#{body}\nAnswer the following:\n"
+end
+```
+
+Page bodies are stored as HTML from a WYSIWYG editor. The gsub chain peels off the structural tags that matter (lists, paragraphs, line breaks) and turns them into plaintext-ish markdown. It is not principled. It works because the editor produces a small, predictable subset of HTML.
+
+That's the entire context the model sees: a generic role line, the page body in rough plaintext, and "answer the following." No retrieval, no embeddings, no fancy tree-walking. The page is the context.
+
+## Streaming the response
+
+A `MessagesController#create` enqueues a background job; the job streams tokens from the LLM and appends each one to the in-progress assistant message:
+
+```ruby
+adapter.stream_chat(system:, messages:) do |token|
+  assistant.update(content: assistant.content + token)
+end
+```
+
+Every `update` triggers a Turbo Streams broadcast over a Rails ActionCable channel, and the page UI re-renders the message body. From the user's perspective, the reply types itself out token by token. Under the hood it is just "save token, broadcast diff, repeat."
+
+The Anthropic adapter wraps the system prompt with `cache_control: { type: "ephemeral" }` to enable Claude's prompt caching. There is a subtle tension: caching pays off when the same system prompt is reused across calls, but Tabletop Ledger rewrites the system prompt on every page navigation. Within a single page, follow-up questions hit the cache; across pages, the first question on each page is a cache miss. For a tool where users typically ask two or three questions per page, that turns out to be fine.
+
+## What's missing
+
+Pages link to entities through inline `<span data-mention='entity' data-entity-id=...>` markers in the HTML. There's a `MentionExtractor` that walks the body, pulls out those span IDs, and persists `Mention` records. But `add_page_context` doesn't follow them. Mentions are a UI cross-linking feature, not a context-expansion one.
+
+The next obvious move is to expand mentions during context assembly: when an NPC page references "Old Town," fetch Old Town's body, append it as a "referenced entity" block in the system prompt. That gets you a one-hop graph walk for free, and starts to make "context-aware" mean something more than "the literal page you're on."
+
+The lesson of the current implementation is that you can ship a useful, scoped chat with a `gsub` chain and a single delete-and-insert per page navigation. The whole feature is maybe forty lines of Ruby. The model does the heavy lifting.

@@ -1,0 +1,56 @@
+---
+title: "W3C TraceContext across async Lambda invocations"
+description: "Why async Lambda traces split in half, and how Firefly bridged the AWS / OpenTelemetry boundary."
+pubDate: 2023-12-06
+draft: false
+tags: ["observability", "aws-lambda", "opentelemetry", "tracing"]
+---
+
+The default story for tracing AWS Lambda is "use the AWS Distro for OpenTelemetry layer and you're done." For synchronous, HTTP-style invocations, that's mostly true. For async invocations (SQS, SNS, direct SDK invokes) the trace splits in half, and you spend a week wondering why your dashboard shows two unrelated, shorter traces instead of the one end-to-end trace you expected.
+
+This is a writeup of how that was fixed on [Firefly](https://try-firefly.github.io/), and what about the AWS / OpenTelemetry boundary made it harder than it should have been.
+
+## The format mismatch
+
+OpenTelemetry's wire format for trace propagation is W3C TraceContext: a `traceparent` header carrying a version byte, a trace ID, a parent span ID, and a flags byte.
+
+![W3C traceparent header structure: version, trace ID, parent span ID, flags](/posts/traceparent-header.png)
+
+AWS X-Ray uses its own format, the `X-Amzn-Trace-Id` header. The two encode roughly the same information, but they are not interchangeable, and the libraries that parse one mostly do not parse the other.
+
+Lambda's default behavior, and the AWS Distro for OpenTelemetry layer's default behavior, is the X-Ray format. The asymmetry that made this painful was that AWS Distro for OpenTelemetry-instrumented Lambdas would *parse* OpenTelemetry-format headers on incoming requests but *inject* AWS-format headers on outgoing ones. Trace context entered the function in W3C format, came out the other side in X-Ray format, and the next Lambda, looking for `traceparent` and finding `X-Amzn-Trace-Id`, gave up and started a new root span. Two disconnected traces where there should have been one.
+
+## SQS and SNS: traceparent in the wrong place
+
+Even when both sides spoke W3C TraceContext, SQS and SNS broke things differently. The OpenTelemetry SQS instrumentation injects `traceparent` into SQS *message attributes*, which is the right move per the spec. The problem is what the receiving Lambda sees: that layer is invisible to the standard incoming-request extractor, which is looking for HTTP headers on a `Records[]` payload that is structurally nothing like an HTTP request.
+
+![AWS Distro for OpenTelemetry layer with an SQS or AWS SDK event: the propagation API can't find context in the non-standard location, so a fresh root context is created and the original is lost](/posts/adot-layer-invocation.png)
+
+The fix was to wrap the user's handler. Before the user function runs, the wrapper:
+
+1. Parses the SQS `Records[]` payload
+2. Extracts `traceparent` from the first record's message attributes
+3. Reassigns the span created by the AWS Distro for OpenTelemetry's auto-instrumentation to the correct parent context
+
+![Firefly's wrapper layer sits above the AWS Distro for OpenTelemetry layer, extracts the traceparent from the non-standard location before the propagation API runs, and reassigns it onto the auto-instrumented span](/posts/firefly-layer.png)
+
+The trace produced by the auto-instrumentation looks the same (same span, same name, same attributes) but its parent link is now the upstream span, not a fresh root. The dashboard sees one trace.
+
+## AWS SDK invokes: stash it in the payload
+
+The other async path is one Lambda calling another via `lambda.invoke(...)`. There is no transport-layer header to inject `traceparent` into; the API has only the function name, invocation type, and payload. The AWS Distro for OpenTelemetry's SDK instrumentation handles this for the synchronous, request-response case (relying on X-Ray under the hood), but for async invokes there is no built-in story.
+
+Firefly's solution was a wrapper around the SDK's `Invoke`:
+
+- On the caller side, inject the active context's `traceparent` into the JSON payload (using a reserved key, e.g. `__traceparent__`).
+- On the callee side, the handler-wrapper extracts and removes that key before passing the payload to the user function.
+
+The payload itself becomes the propagation channel. The user function never sees the trace key; downstream instrumentation works as if a normal W3C-formatted header arrived on a normal HTTP request.
+
+## What this is not
+
+EventBridge, S3 events, and Lambda destinations were out of scope. Each of those transports needs its own bespoke wrapper, and the broader fix is an importable library that handles all of them uniformly rather than a Lambda layer that only works for the cases somebody happened to instrument.
+
+The deeper lesson, three years on, is that auto-instrumentation libraries *almost* solve distributed tracing for AWS, and the gap between "almost" and "actually" is several days of digging into how a specific transport encodes context, where the receiver looks for it, and which side of the AWS-vs-OpenTelemetry format boundary you happen to be sitting on. If you're building observability tooling for serverless, assume async paths need their own propagation strategy, and budget time for it.
+
+*Diagrams from the [Firefly case study](https://try-firefly.github.io/).*

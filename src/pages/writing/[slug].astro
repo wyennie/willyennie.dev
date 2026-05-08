@@ -55,4 +55,13 @@ const fmt = (d: Date) =>
   .body :global(p) { margin-bottom: var(--s-4); }
   .body :global(ul), .body :global(ol) { margin-bottom: var(--s-4); }
   .body :global(li) { margin-bottom: var(--s-1); }
+  .body :global(img) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: var(--s-5) 0;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+    filter: brightness(0.75) contrast(1.05);
+  }
 </style>
