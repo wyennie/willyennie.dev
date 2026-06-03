@@ -38,6 +38,8 @@ const fmtDate = (d: Date | 'present') =>
 const fmtRange = (r: Role) =>
   r.displayDate ?? `${fmtDate(r.start)} – ${fmtDate(r.end)}`;
 
+/* One chronological list. Roles and open-source / personal projects are
+   intermixed, most-recent first, under a single Experience heading. */
 const experience: Role[] = [
   {
     company: 'Insight Designs Web Solutions',
@@ -48,6 +50,7 @@ const experience: Role[] = [
     summary:
       'Full-stack and infrastructure work for a Boulder-based web design consultancy with 600+ clients across its portfolio.',
     bullets: [
+      'Worked directly with clients to scope requirements and ship features and fixes across the agency\'s portfolio of sites.',
       'Built a Python tool to automate vulnerability monitoring across 100+ client sites, flagging outdated or compromised dependencies.',
       'Built a reusable Google Reviews component (Google Places API) that any client site could embed.',
       'Hardened DigitalOcean infrastructure for 40+ client websites: security updates (Apache, MySQL), SSL provisioning, and monitoring.',
@@ -55,37 +58,6 @@ const experience: Role[] = [
     stack: ['Python', 'JavaScript', 'PHP', 'DigitalOcean', 'MySQL'],
     anchor: 'insight',
   },
-  {
-    company: 'Animal Rescue Fund of the Hamptons',
-    title: 'Animal Care & Operations',
-    location: 'Hamptons, NY',
-    start: new Date(2012, 0),
-    end: new Date(2020, 0),
-    displayDate: '2012 – 2020',
-    anchor: 'arf',
-  },
-];
-
-const openSource: Role[] = [
-  {
-    company: 'ZenML',
-    title: 'Open-source contributor',
-    location: 'Remote',
-    start: new Date(2024, 5),
-    end: new Date(2024, 9),
-    displayDate: '2024',
-    summary: 'Built a chatbot feature for the official ZenML VSCode extension.',
-    bullets: [
-      'Integrated OpenAI and Anthropic Claude APIs for context-aware chat scoped to the user\'s selected ML pipeline.',
-      'Built the chat UI: dropdowns, interactive controls, per-conversation context selection, and state management.',
-      'Implemented token-by-token message streaming so responses arrive live instead of as a single blocking call.',
-    ],
-    stack: ['TypeScript', 'VSCode Extension API', 'OpenAI API', 'Anthropic Claude API'],
-    anchor: 'zenml',
-  },
-];
-
-const projects: Role[] = [
   {
     company: 'open source',
     title: 'Workforce',
@@ -117,6 +89,22 @@ const projects: Role[] = [
     ],
     stack: ['Rails', 'WebSockets', 'AI APIs', 'WYSIWYG editor'],
     anchor: 'ttledger',
+  },
+  {
+    company: 'ZenML',
+    title: 'Open-source contributor',
+    location: 'Remote',
+    start: new Date(2024, 5),
+    end: new Date(2024, 9),
+    displayDate: '2024',
+    summary: 'Built a chatbot feature for the official ZenML VSCode extension.',
+    bullets: [
+      'Integrated OpenAI and Anthropic Claude APIs for context-aware chat scoped to the user\'s selected ML pipeline.',
+      'Built the chat UI: dropdowns, interactive controls, per-conversation context selection, and state management.',
+      'Implemented token-by-token message streaming so responses arrive live instead of as a single blocking call.',
+    ],
+    stack: ['TypeScript', 'VSCode Extension API', 'OpenAI API', 'Anthropic Claude API'],
+    anchor: 'zenml',
   },
   {
     company: 'open source',
@@ -199,58 +187,10 @@ const education = [
           )}
         </article>
       ))}
-    </section>
-
-    <section>
-      <h2>Open Source</h2>
-      {openSource.map((r) => (
-        <article class="role" id={r.anchor}>
-          <header class="role-head">
-            <h3>{r.title} · <span class="company">{r.company}</span></h3>
-            <span class="when">{fmtRange(r)}{r.location ? ` · ${r.location}` : ''}</span>
-          </header>
-          {r.summary && <p class="role-summary">{r.summary}</p>}
-          {r.bullets && (
-            <ul>
-              {r.bullets.map((b) => <li>{b}</li>)}
-            </ul>
-          )}
-          {r.stack && (
-            <p class="stack-line">
-              <span class="lbl">stack:</span> {r.stack.join(' · ')}
-            </p>
-          )}
-        </article>
-      ))}
-    </section>
-
-    <section>
-      <h2>Projects</h2>
-      <p class="muted no-print">
-        Full case studies at <a href="/projects">willyennie.dev/projects</a>.
-      </p>
-      {projects.map((r) => (
-        <article class="role" id={r.anchor}>
-          <header class="role-head">
-            <h3>{r.title} · <span class="company">{r.company}</span></h3>
-            <span class="when">{fmtRange(r)}{r.location ? ` · ${r.location}` : ''}</span>
-          </header>
-          {r.summary && <p class="role-summary">{r.summary}</p>}
-          {r.bullets && (
-            <ul>
-              {r.bullets.map((b) => <li>{b}</li>)}
-            </ul>
-          )}
-          {r.stack && (
-            <p class="stack-line">
-              <span class="lbl">stack:</span> {r.stack.join(' · ')}
-            </p>
-          )}
-        </article>
-      ))}
       <ul class="proj-line no-print">
         <li><strong>HookScope</strong>: webhook debugger; capture, inspect, and replay incoming webhooks against a local handler.</li>
         <li><strong>FlightWise / TaskVault / ShopSense</strong>: earlier full-stack work on flight visualization, task tracking, and e-commerce.</li>
+        <li class="muted">Full case studies at <a href="/projects">willyennie.dev/projects</a>.</li>
       </ul>
     </section>
 
@@ -282,6 +222,14 @@ const education = [
 </Layout>
 
 <script>
+  // The downloadable PDF is generated by loading /work/?pdf and printing it
+  // headlessly. The `pdf-build` class opens up the line-height/spacing so the
+  // content fills the page; a normal Ctrl+P (no ?pdf) keeps the tighter
+  // spacing the live print path needs to stay on one page.
+  if (new URLSearchParams(window.location.search).has('pdf')) {
+    document.documentElement.classList.add('pdf-build');
+  }
+
   const triggerPrintFromHash = () => {
     if (window.location.hash === '#print') {
       history.replaceState(null, '', window.location.pathname);
@@ -296,6 +244,15 @@ const education = [
   .resume {
     padding-block: var(--s-7) var(--s-8);
     max-width: 50rem;
+  }
+  /* Resume reads as a document, not a terminal: normal sans throughout,
+     overriding the site-wide mono headers/labels for legibility. */
+  .resume :is(h1, h2, h3),
+  .resume .contact,
+  .resume .when,
+  .resume .stack-line,
+  .resume .skills dt {
+    font-family: var(--font-sans);
   }
   .masthead {
     display: flex;
@@ -406,33 +363,59 @@ const education = [
   .proj-line li { margin-bottom: var(--s-2); }
   .muted { color: var(--c-text-muted); margin-bottom: var(--s-3); }
 
-  /* Print refinements specific to this page */
+  /* Print refinements specific to this page.
+
+     Standard 0.5in margins on one page. The margin is supplied as document
+     padding rather than via @page, because the two print paths treat @page
+     differently: headless Chromium (the generated download) ignores @page
+     margins and prints edge-to-edge, and a browser Ctrl+P adds its own margins
+     on top of @page. Padding is honored identically by both, so it gives a
+     consistent 0.5in frame either way. @page margin stays 0 so that padding
+     isn't stacked on top of a page margin (which would push content onto a
+     second page). Type/spacing fit all content on one page within those
+     margins.
+
+     The generated download (.pdf-build, loaded via /work/?pdf) opens the
+     line-height and section/role spacing so the same content fills the page
+     instead of leaving a tall bottom margin. Ctrl+P keeps the tighter base
+     spacing. */
   @page { size: letter; margin: 0; }
   @media print {
-    .resume { padding: 0.2in 0.4in; max-width: none; font-size: 8pt; line-height: 1.05; }
-    section { margin-bottom: 0.1rem; }
+    .resume { padding: 0.5in; max-width: none; font-size: 7.5pt; line-height: 1.05; }
+    section { margin-bottom: 0.06rem; }
     section h2 {
-      font-size: 9.5pt;
-      margin-bottom: 0.15rem;
-      padding-bottom: 0.08rem;
+      font-size: 9pt;
+      margin-bottom: 0.12rem;
+      padding-bottom: 0.06rem;
       border-bottom: 1px solid #999;
       color: #000;
     }
-    .masthead { padding-bottom: 0.22rem; margin-bottom: 0.22rem; }
-    .masthead h1 { font-size: 16pt; }
-    .contact { font-size: 7.5pt; line-height: 1.2; }
-    .role { page-break-inside: avoid; break-inside: avoid; margin-bottom: 0.2rem; }
-    .role-head h3 { font-size: 9.5pt; }
-    .role-summary { margin-top: 0.08rem; }
-    .role ul { margin-top: 0.08rem; padding-left: 1rem; }
-    .role ul li { margin-bottom: 0.02rem; }
-    .stack-line { margin-top: 0.1rem; font-size: 7.5pt; }
+    .masthead { padding-bottom: 0.16rem; margin-bottom: 0.16rem; }
+    .masthead h1 { font-size: 15pt; }
+    .contact { font-size: 7pt; line-height: 1.2; }
+    .role { page-break-inside: avoid; break-inside: avoid; margin-bottom: 0.14rem; }
+    .role-head h3 { font-size: 9pt; }
+    .role-summary { margin-top: 0.05rem; }
+    .role ul { margin-top: 0.05rem; padding-left: 1rem; }
+    .role ul li { margin-bottom: 0.01rem; }
+    .stack-line { margin-top: 0.07rem; font-size: 7pt; }
     .cols { gap: 1rem; }
     .cols > div { page-break-inside: avoid; break-inside: avoid; }
-    .skills { row-gap: 0.1rem; column-gap: 0.5rem; }
-    .skills dd { font-size: 8pt; }
-    .edu h3 { font-size: 10pt; }
-    .edu p { font-size: 8.5pt; margin-top: 0.1rem; }
+    .skills { row-gap: 0.06rem; column-gap: 0.5rem; }
+    .skills dd { font-size: 7.5pt; }
+    .edu h3 { font-size: 9.5pt; }
+    .edu p { font-size: 8pt; margin-top: 0.06rem; }
     .proj-line li { orphans: 1; widows: 1; }
+
+    /* Download-only: open up spacing so the page fills out. :global because
+       .pdf-build sits on <html>, outside this component's scope. */
+    :global(.pdf-build) .resume { line-height: 1.34; }
+    :global(.pdf-build) section { margin-bottom: 0.45rem; }
+    :global(.pdf-build) section h2 { margin-bottom: 0.15rem; }
+    :global(.pdf-build) .role { margin-bottom: 0.22rem; }
+    :global(.pdf-build) .role-summary { margin-top: 0.07rem; }
+    :global(.pdf-build) .role ul { margin-top: 0.07rem; }
+    :global(.pdf-build) .role ul li { margin-bottom: 0.03rem; }
+    :global(.pdf-build) .stack-line { margin-top: 0.09rem; }
   }
 </style>
