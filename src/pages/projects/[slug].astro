@@ -26,7 +26,7 @@ const { data } = project;
         <span>{data.year}</span>
         {data.role && <><span class="sep">·</span><span>{data.role}</span></>}
       </p>
-      <h1>{data.title}</h1>
+      <h1 transition:name={`project-title-${project.id}`}>{data.title}</h1>
       <p class="tagline">{data.tagline}</p>
 
       <div class="meta">

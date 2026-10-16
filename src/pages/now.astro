@@ -1,5 +1,7 @@
 ---
 import Layout from '~/layouts/Layout.astro';
+import ZoomImage from '~/components/ZoomImage.astro';
+import photo from '~/assets/now-photo.jpg';
 
 const updated = '2026-05-08';
 ---
@@ -26,9 +28,19 @@ const updated = '2026-05-08';
     <h2>Other Things</h2>
     <ul>
       <li>Reading <em>Infinite Jest</em> by David Foster Wallace.</li>
-      <li>Listening <em>The Eye of the World (Wheel of Time 1)</em> by Robert Jordan.</li> 
+      <li>Listening to <em>The Eye of the World (Wheel of Time 1)</em> by Robert Jordan.</li> 
       <li>Game Master Prep: Preparing for PC's fight against rival band of mercenaries.</li>
     </ul>
+
+    <h2>From the camera roll</h2>
+    <ZoomImage
+      src={photo}
+      alt="Sunset over the bay at Long Beach in Noyack, NY: blue clouds above a thin orange horizon, with shallow water washing over a rocky beach in the foreground"
+      caption="Long Beach, Noyack, NY"
+      width={1216}
+      widths={[608, 912, 1216]}
+      sizes="(max-width: 41rem) calc(100vw - 3rem), 38rem"
+    />
 
     <h2>Looking for</h2>
     <p>A full-stack role with real product surface: debugging, observability, performance, the kinds of problems that reward going deep. Language-agnostic. Based in New York; onsite, hybrid, or remote.</p>

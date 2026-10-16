@@ -39,6 +39,7 @@ const isActive = (href: string) =>
       </ul>
     </nav>
   </div>
+  <div class="progress" aria-hidden="true"></div>
 </header>
 
 <style>
@@ -50,6 +51,21 @@ const isActive = (href: string) =>
     backdrop-filter: saturate(140%) blur(8px);
     border-bottom: 1px solid var(--c-border);
   }
+  .progress {
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background: var(--c-accent);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+  }
+  @supports (animation-timeline: scroll()) {
+    .progress {
+      animation: progress linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+  @keyframes progress { to { transform: scaleX(1); } }
   .row {
     display: flex;
     align-items: center;
@@ -130,7 +146,8 @@ const isActive = (href: string) =>
   @media (max-width: 540px) {
     .brand-name { display: none; }
     nav ul { gap: var(--s-2); }
-    .nav-link { padding: var(--s-1); }
+    .nav-link { padding: var(--s-1); white-space: nowrap; }
+    .nav-link::before { display: none; }
     .cmd-li { display: none; }
   }
 </style>

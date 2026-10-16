@@ -1,30 +1,36 @@
 /* ============================================================
    willyennie.dev: design tokens + reset
-   Dark-only. Mono headers, sans body. Single accent: teal.
+   Light, clean neutrals. Mono headers, sans body. Single accent: cobalt.
    ============================================================ */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* Color (neutral scale, perceptual, not literal black) */
-  --c-bg:        #0b0d0e;
-  --c-bg-raised: #131618;
-  --c-bg-sunken: #08090a;
-  --c-border:    #23282b;
-  --c-border-strong: #353c40;
-  --c-text:      #e6e9ea;
-  --c-text-muted: #9aa3a7;
-  --c-text-dim:   #5f676b;
+  /* Color (true neutral scale; every text tier passes WCAG AA on bg) */
+  --c-bg:        #fafafa;
+  --c-bg-raised: #ffffff;
+  --c-bg-sunken: #f2f2f3;
+  --c-border:    #e4e4e7;
+  --c-border-strong: #cdcdd3;
+  --c-text:      #111113;
+  --c-text-muted: #45454d;
+  --c-text-dim:   #6b6b73;
 
-  /* Single accent */
-  --c-accent:        #5eead4;
-  --c-accent-hover:  #7ff0dc;
-  --c-accent-dim:    #2c5e57;
-  --c-accent-on:     #052725;
+  /* Single accent: high-contrast cobalt (~6.4:1 on bg) */
+  --c-accent:        #1d4ed8;
+  --c-accent-hover:  #1e3a8a;
+  --c-accent-dim:    #b4c6f6;
+  --c-accent-on:     #ffffff;
+  --c-accent-soft:   #dbe5fd;
 
   /* Status */
-  --c-success: #5eead4;
-  --c-danger:  #f87171;
+  --c-success: #15803d;
+  --c-danger:  #b91c1c;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05), 0 1px 1px rgb(0 0 0 / 0.03);
+  --shadow-md: 0 2px 4px rgb(0 0 0 / 0.04), 0 8px 24px -6px rgb(0 0 0 / 0.10);
+  --shadow-lg: 0 4px 8px rgb(0 0 0 / 0.04), 0 24px 56px -12px rgb(0 0 0 / 0.18);
 
   /* Typography */
   --font-mono: ui-monospace, "JetBrains Mono", "Fira Code", "SF Mono",
@@ -177,6 +183,21 @@ hr {
 
 .prose {
   max-width: var(--prose-max);
+}
+
+/* Scroll-driven reveal (progressive enhancement) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: none; }
 }
 
 /* Reduce motion */

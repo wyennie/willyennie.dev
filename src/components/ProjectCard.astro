@@ -11,9 +11,9 @@ const { data, id } = project;
 const href = `/projects/${id}`;
 ---
 
-<a href={href} class:list={['card', variant]}>
+<a href={href} class:list={['card', variant]} data-card>
   <div class="head">
-    <h3 class="title">{data.title}</h3>
+    <h3 class="title" transition:name={`project-title-${id}`}>{data.title}</h3>
     <span class="year">{data.year}</span>
   </div>
   <p class="tagline">{data.tagline}</p>
@@ -25,26 +25,97 @@ const href = `/projects/${id}`;
   <span class="more" aria-hidden="true">read →</span>
 </a>
 
+<script>
+  // Pointer-tracked spotlight + tilt. Delegated so it survives page swaps.
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (fine && !document.documentElement.dataset.cardFx) {
+    document.documentElement.dataset.cardFx = '1';
+    document.addEventListener('pointermove', (e) => {
+      const card = (e.target as Element | null)?.closest<HTMLElement>('[data-card]');
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      card.style.setProperty('--mx', `${px * 100}%`);
+      card.style.setProperty('--my', `${py * 100}%`);
+      if (!still) {
+        card.style.setProperty('--rx', `${(0.5 - py) * 5}deg`);
+        card.style.setProperty('--ry', `${(px - 0.5) * 7}deg`);
+      }
+    }, { passive: true });
+    document.addEventListener('pointerout', (e) => {
+      const card = (e.target as Element | null)?.closest<HTMLElement>('[data-card]');
+      if (!card || card.contains(e.relatedTarget as Node | null)) return;
+      card.style.setProperty('--rx', '0deg');
+      card.style.setProperty('--ry', '0deg');
+    });
+  }
+</script>
+
 <style>
   .card {
+    --mx: 50%;
+    --my: 0%;
+    --rx: 0deg;
+    --ry: 0deg;
+    position: relative;
+    isolation: isolate;
     display: block;
+    height: 100%;
     color: var(--c-text);
     text-decoration: none;
     background: var(--c-bg-raised);
     border: 1px solid var(--c-border);
-    border-radius: var(--r-md);
+    border-radius: var(--r-lg);
     padding: var(--s-5);
+    box-shadow: var(--shadow-sm);
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transform-style: preserve-3d;
     transition:
       border-color var(--dur-normal) var(--ease-out),
-      transform var(--dur-normal) var(--ease-out),
-      background-color var(--dur-normal) var(--ease-out);
+      box-shadow var(--dur-normal) var(--ease-out),
+      transform 400ms var(--ease-out);
+  }
+  /* soft spotlight fill */
+  .card::before,
+  /* spotlight-lit border */
+  .card::after {
+    content: '';
+    position: absolute;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--dur-normal) var(--ease-out);
+  }
+  .card::before {
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      420px circle at var(--mx) var(--my),
+      color-mix(in srgb, var(--c-accent) 9%, transparent),
+      transparent 60%
+    );
+  }
+  .card::after {
+    inset: -1px;
+    padding: 1px;
+    background: radial-gradient(
+      260px circle at var(--mx) var(--my),
+      var(--c-accent),
+      transparent 70%
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
   }
   .card:hover {
-    border-color: var(--c-accent-dim);
     text-decoration: none;
-    transform: translateY(-1px);
-    background: color-mix(in srgb, var(--c-bg-raised) 80%, var(--c-accent) 4%);
+    box-shadow: var(--shadow-lg);
   }
+  .card:hover::before,
+  .card:hover::after { opacity: 1; }
+  .card:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
   .card.featured {
     padding: var(--s-6);
   }
@@ -86,9 +157,13 @@ const href = `/projects/${id}`;
     padding: 0.15em 0.55em;
     border-radius: var(--r-sm);
   }
+  .stack li { background: var(--c-bg); }
   .more {
+    display: inline-block;
     font-family: var(--font-mono);
     font-size: var(--fs-sm);
     color: var(--c-accent);
+    transition: transform var(--dur-normal) var(--ease-out);
   }
+  .card:hover .more { transform: translateX(4px); }
 </style>

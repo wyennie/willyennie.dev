@@ -1,0 +1,176 @@
+---
+// Interactive dot field behind the hero. Dots spring away from the cursor
+// and a click/tap sends a ripple through the grid. Static under reduced motion.
+---
+
+<canvas class="hero-field" aria-hidden="true" data-hero-field></canvas>
+
+<script>
+  type Dot = { x: number; y: number; dx: number; dy: number; vx: number; vy: number };
+  type Ripple = { x: number; y: number; t: number };
+
+  const GAP = 22;
+  const LENS = 130;      // cursor influence radius (px)
+  const PUSH = 26;       // max displacement from cursor
+  const RIPPLE_SPEED = 0.6; // px per ms
+  const RIPPLE_LIFE = 1400; // ms
+
+  let teardown: (() => void) | null = null;
+
+  const mount = () => {
+    teardown?.();
+    teardown = null;
+
+    const canvas = document.querySelector<HTMLCanvasElement>('[data-hero-field]');
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const css = getComputedStyle(document.documentElement);
+    const ink = css.getPropertyValue('--c-text-dim').trim() || '#6b6b73';
+    const accent = css.getPropertyValue('--c-accent').trim() || '#1d4ed8';
+
+    let dots: Dot[] = [];
+    let ripples: Ripple[] = [];
+    let w = 0, h = 0, dpr = 1;
+    const pointer = { x: -9999, y: -9999, active: false };
+    let raf = 0;
+    let visible = true;
+    let start = performance.now();
+
+    const build = () => {
+      const rect = canvas.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = rect.width; h = rect.height;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      dots = [];
+      const ox = (w % GAP) / 2, oy = (h % GAP) / 2;
+      for (let y = oy; y <= h; y += GAP) {
+        for (let x = ox; x <= w; x += GAP) {
+          dots.push({ x, y, dx: 0, dy: 0, vx: 0, vy: 0 });
+        }
+      }
+    };
+
+    const draw = (now: number) => {
+      const t = now - start;
+      ctx.clearRect(0, 0, w, h);
+      ripples = ripples.filter((r) => now - r.t < RIPPLE_LIFE);
+
+      for (const d of dots) {
+        let tx = 0, ty = 0, glow = 0;
+
+        if (!reduced) {
+          // cursor lens: push outward, falloff with distance
+          if (pointer.active) {
+            const ex = d.x - pointer.x, ey = d.y - pointer.y;
+            const dist = Math.hypot(ex, ey);
+            if (dist < LENS && dist > 0.01) {
+              const f = 1 - dist / LENS;
+              const ease = f * f * (3 - 2 * f);
+              tx += (ex / dist) * PUSH * ease;
+              ty += (ey / dist) * PUSH * ease;
+              glow = Math.max(glow, ease);
+            }
+          }
+          // ripples: a travelling ring that kicks dots outward
+          for (const r of ripples) {
+            const age = now - r.t;
+            const radius = age * RIPPLE_SPEED;
+            const ex = d.x - r.x, ey = d.y - r.y;
+            const dist = Math.hypot(ex, ey) || 1;
+            const band = 1 - Math.abs(dist - radius) / 40;
+            if (band > 0) {
+              const life = 1 - age / RIPPLE_LIFE;
+              const k = band * life;
+              tx += (ex / dist) * 14 * k;
+              ty += (ey / dist) * 14 * k;
+              glow = Math.max(glow, k);
+            }
+          }
+          // springs toward target displacement
+          d.vx += (tx - d.dx) * 0.12;
+          d.vy += (ty - d.dy) * 0.12;
+          d.vx *= 0.78; d.vy *= 0.78;
+          d.dx += d.vx; d.dy += d.vy;
+        }
+
+        // slow ambient breathing
+        const wave = reduced ? 0.5 : 0.5 + 0.5 * Math.sin(d.x * 0.012 + d.y * 0.018 + t * 0.0009);
+        const r = 1 + wave * 0.5 + glow * 1.6;
+        ctx.globalAlpha = 0.2 + wave * 0.2 + glow * 0.6;
+        ctx.fillStyle = glow > 0.15 ? accent : ink;
+        ctx.beginPath();
+        ctx.arc(d.x + d.dx, d.y + d.dy, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const loop = (now: number) => {
+      draw(now);
+      raf = visible ? requestAnimationFrame(loop) : 0;
+    };
+
+    const onMove = (e: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      pointer.x = e.clientX - rect.left;
+      pointer.y = e.clientY - rect.top;
+      pointer.active = pointer.y > -LENS && pointer.y < rect.height + LENS;
+    };
+    const onLeave = () => { pointer.active = false; };
+    const onDown = (e: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      if (y < 0 || y > rect.height) return;
+      ripples.push({ x, y, t: performance.now() });
+    };
+
+    const ro = new ResizeObserver(() => { build(); if (reduced) draw(performance.now()); });
+    ro.observe(canvas);
+
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting && !document.hidden;
+      if (visible && !raf && !reduced) raf = requestAnimationFrame(loop);
+    });
+    io.observe(canvas);
+
+    build();
+    if (reduced) {
+      draw(performance.now());
+    } else {
+      window.addEventListener('pointermove', onMove, { passive: true });
+      document.addEventListener('pointerleave', onLeave);
+      window.addEventListener('pointerdown', onDown, { passive: true });
+      // opening ripple from behind the name
+      ripples.push({ x: Math.min(w * 0.25, 260), y: h * 0.45, t: performance.now() + 250 });
+      raf = requestAnimationFrame(loop);
+    }
+
+    teardown = () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      io.disconnect();
+      window.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerleave', onLeave);
+      window.removeEventListener('pointerdown', onDown);
+    };
+  };
+
+  document.addEventListener('astro:page-load', mount);
+  document.addEventListener('astro:before-swap', () => { teardown?.(); teardown = null; });
+</script>
+
+<style>
+  .hero-field {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 35% 50%, #000 30%, transparent 85%);
+            mask-image: radial-gradient(ellipse 75% 70% at 35% 50%, #000 30%, transparent 85%);
+  }
+</style>

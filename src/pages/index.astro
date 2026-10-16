@@ -3,6 +3,9 @@ import { getCollection } from 'astro:content';
 import Layout from '~/layouts/Layout.astro';
 import Pill from '~/components/Pill.astro';
 import ProjectCard from '~/components/ProjectCard.astro';
+import HeroField from '~/components/HeroField.astro';
+import { Image } from 'astro:assets';
+import portrait from '~/assets/portrait.jpg';
 import { SITE } from '~/lib/site';
 
 const featured = (await getCollection('projects', (p) => !p.data.draft && p.data.featured))
@@ -13,15 +16,21 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
   title=""
   description="Will Yennie, full-stack engineer who builds new things and fixes old things. Based in NYC."
 >
+  <div class="hero-wrap">
+  <HeroField />
   <section class="hero container">
     {SITE.available && (
       <Pill tone="accent" dot>available for hire</Pill>
     )}
 
-    <h1 class="name">Will Yennie</h1>
+    <h1 class="name" aria-label="Will Yennie">
+      {'Will Yennie'.split('').map((ch, i) => (
+        <span class="ch" aria-hidden="true" style={`--i:${i}`}>{ch === ' ' ? '\u00a0' : ch}</span>
+      ))}
+    </h1>
 
     <p class="lede prose">
-      Full-stack engineer who builds new things and fixes old things.
+      Full-stack engineer who <mark>builds new things</mark> and <mark>fixes old things</mark>.
     </p>
 
     <div class="cta">
@@ -31,9 +40,11 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
       </a>
       <a href="/work" class="btn ghost">see work →</a>
     </div>
+    <p class="hint no-print" aria-hidden="true">psst, click anywhere up here</p>
   </section>
+  </div>
 
-  <section class="fit container">
+  <section class="fit container reveal">
     <h2><span class="hash">#</span> a fit if you're hiring for</h2>
     <dl class="fit-list">
       <div class="fit-row">
@@ -56,17 +67,28 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
   </section>
 
   <section class="featured container">
-    <header class="section-head">
+    <header class="section-head reveal">
       <h2><span class="hash">#</span> featured work</h2>
       <a href="/projects" class="see-all">all projects →</a>
     </header>
 
     <div class="grid">
-      {featured.map((p) => <ProjectCard project={p} variant="featured" />)}
+      {featured.map((p) => <div class="reveal"><ProjectCard project={p} variant="featured" /></div>)}
     </div>
   </section>
 
-  <section class="bio container prose">
+  <section class="bio container reveal">
+    <figure class="portrait">
+      <Image
+        src={portrait}
+        alt="Will Yennie, smiling, in glasses and a maroon sweater"
+        width={480}
+        widths={[240, 360, 480]}
+        sizes="(max-width: 640px) 160px, 240px"
+        loading="lazy"
+      />
+    </figure>
+    <div class="bio-text prose">
     <h2><span class="hash">#</span> the short version</h2>
     <p>
       I came to engineering through Launch School's multi-year, mastery-based
@@ -87,23 +109,65 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
     <p>
       Currently looking. <a href={`mailto:${SITE.email}`}>Get in touch</a>.
     </p>
+    </div>
   </section>
 </Layout>
 
 <style>
+  .hero-wrap {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--c-border);
+  }
   .hero {
-    padding-block: var(--s-8) var(--s-7);
+    position: relative;
+    padding-block: var(--s-9) var(--s-8);
   }
   .name {
     margin-top: var(--s-4);
-    font-size: clamp(2.5rem, 7vw, 4rem);
-    letter-spacing: -0.02em;
+    font-size: clamp(2.75rem, 9vw, 5.5rem);
+    letter-spacing: -0.04em;
+    font-weight: 700;
+  }
+  .ch {
+    display: inline-block;
+    animation: rise 900ms var(--ease-out) both;
+    animation-delay: calc(var(--i) * 45ms + 100ms);
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(0.45em) rotate(6deg); filter: blur(6px); }
+    to   { opacity: 1; transform: none; filter: none; }
   }
   .lede {
     margin-top: var(--s-5);
-    font-size: var(--fs-md);
-    color: var(--c-text);
+    font-size: var(--fs-lg);
+    line-height: var(--lh-snug);
+    color: var(--c-text-muted);
+    animation: fade 800ms var(--ease-out) 650ms both;
   }
+  .lede mark {
+    color: var(--c-text);
+    background:
+      linear-gradient(var(--c-accent-soft), var(--c-accent-soft))
+      0 88% / 0% 40% no-repeat;
+    animation: highlight 700ms var(--ease-out) both;
+    animation-delay: 1100ms;
+  }
+  .lede mark + mark { animation-delay: 1350ms; }
+  @keyframes highlight { to { background-size: 100% 40%; } }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .hero .cta { animation: fade 800ms var(--ease-out) 850ms both; }
+  .hint {
+    margin-top: var(--s-6);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-text-dim);
+    animation: fade 800ms var(--ease-out) 2200ms both;
+  }
+  @media (hover: none) { .hint { display: none; } }
   .cta {
     margin-top: var(--s-6);
     display: flex;
@@ -126,6 +190,7 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
   .btn.primary {
     background: var(--c-accent);
     color: var(--c-accent-on);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgb(255 255 255 / 0.15);
   }
   .btn.primary:hover {
     background: var(--c-accent-hover);
@@ -135,6 +200,8 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
   .btn.ghost {
     color: var(--c-text);
     border-color: var(--c-border-strong);
+    background: color-mix(in srgb, var(--c-bg-raised) 70%, transparent);
+    backdrop-filter: blur(6px);
   }
   .btn.ghost:hover {
     border-color: var(--c-accent);
@@ -164,7 +231,7 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
     font-size: var(--fs-sm);
   }
 
-  .fit { padding-block: var(--s-5) var(--s-6); }
+  .fit { padding-block: var(--s-7) var(--s-6); }
   .fit h2 {
     font-size: var(--fs-lg);
     color: var(--c-text-muted);
@@ -199,11 +266,41 @@ const featured = (await getCollection('projects', (p) => !p.data.draft && p.data
   .featured { padding-block: var(--s-6); }
   .grid {
     display: grid;
+    perspective: 1200px;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--s-4);
   }
 
-  .bio { padding-block: var(--s-7); }
+  .bio {
+    padding-block: var(--s-7);
+    display: grid;
+    grid-template-columns: 240px minmax(0, var(--prose-max));
+    gap: var(--s-7);
+    align-items: start;
+  }
+  .portrait {
+    margin: 0;
+    /* line the photo up with the heading */
+    margin-top: var(--s-1);
+  }
+  .portrait :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 35%;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--c-border);
+    box-shadow: var(--shadow-md);
+    background: var(--c-bg-sunken);
+  }
+  @media (max-width: 860px) {
+    .bio { grid-template-columns: 180px minmax(0, 1fr); gap: var(--s-5); }
+  }
+  @media (max-width: 640px) {
+    .bio { grid-template-columns: 1fr; gap: var(--s-5); }
+    .portrait { width: 160px; margin-top: 0; }
+  }
   .bio h2 { font-size: var(--fs-lg); color: var(--c-text-muted); font-weight: 500; margin-bottom: var(--s-4); }
   .bio p + p { margin-top: var(--s-4); }
 </style>
