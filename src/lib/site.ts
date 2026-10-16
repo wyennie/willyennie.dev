@@ -8,7 +8,7 @@ export const SITE = {
   email: 'will@willyennie.dev',
   github: 'https://github.com/wyennie',
   linkedin: 'https://www.linkedin.com/in/will-yennie',
-  location: 'New York, NY',
+  location: 'Sag Harbor, NY',
   available: true,
 } as const;
 
