@@ -71,8 +71,8 @@
   --r-pill: 999px;
 
   /* Layout */
-  --content-max: 64rem;
-  --prose-max:   38rem;
+  --content-max: 76rem;
+  --prose-max:   48rem;
 
   /* Motion */
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -120,6 +120,7 @@ a:focus-visible {
 }
 
 h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
   font-family: var(--font-mono);
   font-weight: 600;
   line-height: var(--lh-tight);

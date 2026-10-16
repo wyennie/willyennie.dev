@@ -10,7 +10,7 @@ const updated = '2026-05-08';
   title="now"
   description="What Will Yennie is working on, learning, and looking for right now."
 >
-  <div class="container page prose">
+  <div class="container page">
     <header class="head">
       <h1>now</h1>
       <p class="meta">Updated {updated}, from my Bushwick apartment ·
@@ -39,7 +39,7 @@ const updated = '2026-05-08';
       caption="Long Beach, Noyack, NY"
       width={1216}
       widths={[608, 912, 1216]}
-      sizes="(max-width: 41rem) calc(100vw - 3rem), 38rem"
+      sizes="(max-width: 51rem) calc(100vw - 3rem), 48rem"
     />
 
     <h2>Looking for</h2>
@@ -54,6 +54,7 @@ const updated = '2026-05-08';
 
 <style>
   .page { padding-block: var(--s-7) var(--s-8); }
+  .page > :global(:is(p, ul, ol, figure)) { max-width: var(--prose-max); }
   .head { margin-bottom: var(--s-6); }
   .head h1 { font-size: var(--fs-2xl); }
   .meta { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--c-text-muted); margin-top: var(--s-2); }
